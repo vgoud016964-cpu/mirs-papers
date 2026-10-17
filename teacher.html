@@ -6,46 +6,64 @@
 <meta name="robots" content="noindex">
 <title>MIRS Practice Papers - Teacher</title>
 <style>
+
 *{box-sizing:border-box}
-body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f3f4f8;color:#172554}
-header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#4f46e5;color:#fff;padding:12px 18px}
-header h1{font-size:18px;margin:0}
-header span{font-size:13px;opacity:.9}
-nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px;background:#fff;border-bottom:1px solid #ddd}
-nav button{background:#eef0ff;color:#312e81;border:0;padding:9px 14px;border-radius:8px;font-weight:600;cursor:pointer}
-nav button.on{background:#4f46e5;color:#fff}
-main{max-width:900px;margin:0 auto;padding:16px}
+:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--primary-dark:#342e9f;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--soft:#f0efff;--shadow:0 10px 30px rgba(38,39,94,.08)}
+body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:linear-gradient(115deg,#25245d 0%,#4b43c7 64%,#167e99 100%);color:#fff;padding:19px max(18px,calc((100% - 1060px)/2));box-shadow:0 8px 24px rgba(43,42,121,.18)}
+header h1{font-size:clamp(18px,2.5vw,24px);margin:0;font-weight:760;letter-spacing:-.4px}
+header span{font-size:13px;opacity:.92}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px max(18px,calc((100% - 1060px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid #e2e7f2;box-shadow:0 4px 14px rgba(25,36,75,.035);position:sticky;top:0;z-index:10}
+nav button{background:#f2f2ff;color:#45409f;border:1px solid transparent;padding:10px 15px;border-radius:10px;font-weight:700;cursor:pointer}
+nav button:hover{background:#e8e7ff}
+nav button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;box-shadow:0 4px 10px rgba(75,67,199,.2)}
+main{max-width:1020px;margin:26px auto;padding:0 18px 42px}
 section{display:none}
 section.on{display:block}
-.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
-input,select,textarea{width:100%;padding:9px;border:1px solid #c7c9d9;border-radius:8px;font:inherit}
-textarea{resize:vertical}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-button.go{background:#4f46e5;color:#fff;border:0;padding:11px 20px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:14px}
-button.go:disabled{opacity:.5;cursor:wait}
-button.sec{background:#fff;color:#4f46e5;border:1px solid #4f46e5;padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600}
-button.del{background:#fff;color:#b91c1c;border:1px solid #b91c1c;padding:6px 10px;border-radius:8px;cursor:pointer}
-.status{margin-top:12px;font-weight:600}
-.err{color:#b91c1c}
-.ok{color:#166534}
-.warn{background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:10px;margin:10px 0;font-size:14px}
-.q{border:1px solid #dcdff0;border-radius:10px;padding:12px;margin:12px 0;background:#fafaff}
-.q h4{margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
-.small{font-size:13px;color:#555}
-.overlay{position:fixed;inset:0;background:#0b1220;display:flex;align-items:center;justify-content:center;z-index:50}
-.box{background:#fff;padding:26px;border-radius:12px;width:330px;max-width:92%}
+.card{background:var(--surface);border:1px solid rgba(216,222,241,.95);border-radius:17px;padding:clamp(17px,2.7vw,24px);margin-bottom:17px;box-shadow:var(--shadow)}
+label{display:block;font-size:13px;font-weight:750;color:#384562;margin:13px 0 6px}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit;transition:border-color .18s,box-shadow .18s}
+input::placeholder,textarea::placeholder{color:#9aa3b6}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(75,67,199,.13)}
+textarea{resize:vertical;min-height:76px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px}
+button{transition:transform .15s,box-shadow .15s,background .15s}
+button:focus-visible{outline:3px solid rgba(14,159,154,.35);outline-offset:2px}
+button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
+button.go:hover:not(:disabled){background:linear-gradient(115deg,#342e9f,#4b43c7);transform:translateY(-1px);box-shadow:0 8px 17px rgba(75,67,199,.23)}
+button.go:disabled{opacity:.55;cursor:wait}
+button.sec{background:#fff;color:#4b43c7;border:1px solid #cbc9f5;padding:8px 13px;border-radius:9px;cursor:pointer;font-weight:700}
+button.sec:hover{background:#f0efff;border-color:#a9a5ef}
+button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 11px;border-radius:9px;cursor:pointer;font-weight:650}
+button.del:hover{background:#ffebed}
+.status{margin-top:12px;font-weight:650}
+.err{color:#b42335}
+.ok{color:#13734d}
+.warn{background:#fff7e9;border:1px solid #f6d19a;border-radius:11px;padding:12px 14px;margin:12px 0;font-size:14px;color:#80551b}
+.q{border:1px solid #dfe2f2;border-radius:13px;padding:15px;margin:13px 0;background:linear-gradient(145deg,#fff,#fafaff)}
+.q h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;color:#29295e}
+.small{font-size:13px;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(22,32,76,.96),rgba(62,49,145,.94),rgba(15,111,133,.91));display:flex;align-items:center;justify-content:center;z-index:50;padding:18px}
+.box{background:#fff;padding:clamp(24px,4vw,34px);border:1px solid rgba(255,255,255,.45);box-shadow:0 24px 70px rgba(7,13,42,.28);border-radius:20px;width:390px;max-width:100%}
+.box:before{content:"MIRS PRACTICE PAPERS";display:block;color:#4b43c7;font-size:11px;font-weight:850;letter-spacing:1.5px;margin-bottom:9px}
+.box h2{color:#202453;font-size:25px;letter-spacing:-.5px}
 .box input{margin-bottom:10px}
-.item{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.password-row{display:flex;gap:8px;align-items:stretch}.password-row input{flex:1;min-width:0}.password-row button{margin:0 0 10px;padding:0 12px;white-space:nowrap}
+.doubt-card{margin:18px 0;padding:17px;border:1px solid #d9ddff;border-radius:14px;background:linear-gradient(135deg,#fafaff,#f3f2ff)}.doubt-card h3{margin:0 0 5px}.doubt-card .go{margin-top:10px}.doubt-answer{white-space:pre-wrap;margin-top:12px;padding:12px;border-radius:10px;background:#fff;border:1px solid #e0e2f5}.doubt-answer:empty{display:none}
+.item{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid #e8ebf4}
 .item:last-child{border:0}
+h2,h3{color:#25265d;letter-spacing:-.35px}
+h2{font-size:clamp(21px,3vw,27px)}
 [hidden]{display:none!important}
+@media(max-width:620px){header{padding:16px;align-items:flex-start}header #outBtn{margin-left:auto}nav{padding:10px 12px;position:static}nav button{flex:1 1 auto;padding:10px 11px}main{margin:17px auto;padding:0 12px 28px}.card{border-radius:14px;padding:16px}button.go{max-width:100%}}
+
 </style>
 </head>
 <body>
 <div id="login" class="overlay"><div class="box">
   <h2 style="margin:0 0 14px">Teacher Login</h2>
   <input id="em" type="email" placeholder="Email">
-  <input id="pw" type="password" placeholder="Password">
+  <div class="password-row"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="togglePw" type="button" class="sec" aria-pressed="false">Show</button></div>
   <button id="loginBtn" class="go" style="width:100%;margin:0">Sign in</button>
   <p id="loginMsg" class="err"></p>
 </div></div>
@@ -83,6 +101,7 @@ button.del{background:#fff;color:#b91c1c;border:1px solid #b91c1c;padding:6px 10
   <div id="editor" class="card" hidden>
     <h3 id="edTitle" style="margin-top:0"></h3>
     <div id="notes"></div>
+    <div class="doubt-card"><h3>Ask a doubt about this paper's topic</h3><p id="teacherDoubtTopic" class="small">Ask about the topic of the paper being created.</p><textarea id="teacherDoubtQuestion" maxlength="500" placeholder="Ask for meaning, explanation, examples, or related information..."></textarea><button id="teacherDoubtBtn" class="go">Ask AI</button><div id="teacherDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>
     <p class="small"><b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
     <div id="qs"></div>
     <button id="saveBtn" class="go">Save paper for students</button>
@@ -131,6 +150,12 @@ $("gClass").innerHTML = CLASSES.map(c => `<option value="${c}">Class ${c}</optio
 $("gSub").innerHTML = SUBJECTS.map(s => `<option>${s}</option>`).join("");
 
 /* ---------- login ---------- */
+$("togglePw").onclick = () => {
+  const showing = $("pw").type === "password";
+  $("pw").type = showing ? "text" : "password";
+  $("togglePw").textContent = showing ? "Hide" : "Show";
+  $("togglePw").setAttribute("aria-pressed", String(showing));
+};
 $("loginBtn").onclick = async () => {
   $("loginMsg").textContent = "";
   try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
@@ -205,9 +230,26 @@ function renderEditor(warnings, changes, writer, checker) {
   if (changes && changes.length) n += `<div class="warn"><b>The second AI fixed these:</b><br>${changes.map(esc).join("<br>")}</div>`;
   if (writer) n += `<p class="small">Written by ${esc(writer)}${checker ? ", checked by " + esc(checker) : ""}.</p>`;
   $("notes").innerHTML = n;
+  $("teacherDoubtTopic").textContent = `Current topic: Class ${cur.classNo} · ${cur.subject} · ${cur.topic}. Unrelated questions will not be answered.`;
+  $("teacherDoubtQuestion").value = "";
+  $("teacherDoubtAnswer").textContent = "";
   $("qs").innerHTML = cur.questions.map(card).join("");
   setStatus("saveStatus", "");
 }
+$("teacherDoubtBtn").onclick = async () => {
+  if (!cur) return;
+  const question = $("teacherDoubtQuestion").value.trim();
+  if (question.length < 2) { $("teacherDoubtAnswer").textContent = "Please type your doubt first."; return; }
+  const b = $("teacherDoubtBtn"), answer = $("teacherDoubtAnswer");
+  b.disabled = true; b.textContent = "Thinking..."; answer.textContent = "Checking whether your doubt is related to this topic...";
+  try {
+    const r = await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "doubt", classNo: Number(cur.classNo), subject: String(cur.subject || ""), topic: String(cur.topic || ""), question }) });
+    const j = await r.json();
+    answer.textContent = j.ok ? j.answer : (j.error || "Could not answer right now. Please try again.");
+  } catch (e) { answer.textContent = "Could not reach the AI service. Please try again."; }
+  finally { b.disabled = false; b.textContent = "Ask AI"; }
+};
+
 $("qs").addEventListener("input", e => {
   const t = e.target, i = +t.dataset.i;
   if (isNaN(i) || !cur) return;
