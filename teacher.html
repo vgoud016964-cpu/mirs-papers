@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MIRS Practice Papers - Teacher</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f3f4f8;color:#172554}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:#4f46e5;color:#fff;padding:12px 18px}
+header h1{font-size:18px;margin:0}
+header span{font-size:13px;opacity:.9}
+nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px;background:#fff;border-bottom:1px solid #ddd}
+nav button{background:#eef0ff;color:#312e81;border:0;padding:9px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+nav button.on{background:#4f46e5;color:#fff}
+main{max-width:900px;margin:0 auto;padding:16px}
+section{display:none}
+section.on{display:block}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px;border:1px solid #c7c9d9;border-radius:8px;font:inherit}
+textarea{resize:vertical}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+button.go{background:#4f46e5;color:#fff;border:0;padding:11px 20px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:14px}
+button.go:disabled{opacity:.5;cursor:wait}
+button.sec{background:#fff;color:#4f46e5;border:1px solid #4f46e5;padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+button.del{background:#fff;color:#b91c1c;border:1px solid #b91c1c;padding:6px 10px;border-radius:8px;cursor:pointer}
+.status{margin-top:12px;font-weight:600}
+.err{color:#b91c1c}
+.ok{color:#166534}
+.warn{background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:10px;margin:10px 0;font-size:14px}
+.q{border:1px solid #dcdff0;border-radius:10px;padding:12px;margin:12px 0;background:#fafaff}
+.q h4{margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
+.small{font-size:13px;color:#555}
+.overlay{position:fixed;inset:0;background:#0b1220;display:flex;align-items:center;justify-content:center;z-index:50}
+.box{background:#fff;padding:26px;border-radius:12px;width:330px;max-width:92%}
+.box input{margin-bottom:10px}
+.item{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.item:last-child{border:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div id="login" class="overlay"><div class="box">
+  <h2 style="margin:0 0 14px">Teacher Login</h2>
+  <input id="em" type="email" placeholder="Email">
+  <input id="pw" type="password" placeholder="Password">
+  <button id="loginBtn" class="go" style="width:100%;margin:0">Sign in</button>
+  <p id="loginMsg" class="err"></p>
+</div></div>
+
+<div id="app" hidden>
+<header><h1>MIRS Practice Papers · Teacher</h1><span id="who"></span><button id="outBtn" class="sec">Sign out</button></header>
+<nav>
+  <button data-tab="gen" class="on">Make paper</button>
+  <button data-tab="saved">Saved papers</button>
+  <button data-tab="rep">Reports <span id="repN"></span></button>
+  <button data-tab="codes">Class codes</button>
+</nav>
+<main>
+
+<section id="tab-gen" class="on">
+  <div class="card">
+    <div class="row">
+      <div><label>Class</label><select id="gClass"></select></div>
+      <div><label>Subject</label><select id="gSub"></select></div>
+      <div><label>Paper type</label><select id="gMode"><option value="practice">Practice paper (answer after each question)</option><option value="question">Question paper (answers at the end)</option></select></div>
+    </div>
+    <label>Topic name</label>
+    <input id="gTopic" placeholder="Example: Living Organisms" maxlength="120">
+    <div class="row">
+      <div><label>MCQ</label><input id="cMcq" type="number" min="0" max="30" value="5"></div>
+      <div><label>Assertion-Reason</label><input id="cAr" type="number" min="0" max="30" value="2"></div>
+      <div><label>Short answer</label><input id="cShort" type="number" min="0" max="30" value="3"></div>
+      <div><label>Long answer</label><input id="cLong" type="number" min="0" max="30" value="2"></div>
+    </div>
+    <p class="small">Total questions: maximum 30. The AI writes the paper, then a second AI model checks it. This can take 1 to 2 minutes.</p>
+    <button id="genBtn" class="go">Generate paper</button>
+    <p id="genStatus" class="status"></p>
+  </div>
+
+  <div id="editor" class="card" hidden>
+    <h3 id="edTitle" style="margin-top:0"></h3>
+    <div id="notes"></div>
+    <p class="small"><b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
+    <div id="qs"></div>
+    <button id="saveBtn" class="go">Save paper for students</button>
+    <button id="cancelBtn" class="sec" style="margin-left:8px">Close without saving</button>
+    <p id="saveStatus" class="status"></p>
+  </div>
+</section>
+
+<section id="tab-saved"><div class="card"><h3 style="margin-top:0">Saved papers</h3><div id="savedList">Loading...</div></div></section>
+<section id="tab-rep"><div class="card"><h3 style="margin-top:0">Wrong-question reports from students</h3><div id="repList">Loading...</div></div></section>
+<section id="tab-codes"><div class="card">
+  <h3 style="margin-top:0">Class codes</h3>
+  <p class="small">Give each class its code. Students need the code to open papers. This is a simple door, not high security.</p>
+  <div id="codeBox"></div>
+  <button id="codeSave" class="go">Save codes</button>
+  <p id="codeStatus" class="status"></p>
+</div></section>
+</main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, setDoc, doc, getDoc, getDocs, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const WORKER_URL = "https://mirs-papers-ai.vgoud016964.workers.dev";
+const firebaseConfig = {
+  apiKey: "AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y",
+  authDomain: "mirs-ai.firebaseapp.com",
+  projectId: "mirs-ai",
+  storageBucket: "mirs-ai.firebasestorage.app",
+  messagingSenderId: "478184601355",
+  appId: "1:478184601355:web:85f99d485db2e12860940e"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SUBJECTS = ["Physics","Chemistry","Biology","Mathematics","Social"];
+const CLASSES = [6,7,8,9,10];
+const TYPE_NAME = { mcq:"MCQ", ar:"Assertion-Reason", short:"Short answer", long:"Long answer" };
+let cur = null;
+
+$("gClass").innerHTML = CLASSES.map(c => `<option value="${c}">Class ${c}</option>`).join("");
+$("gSub").innerHTML = SUBJECTS.map(s => `<option>${s}</option>`).join("");
+
+/* ---------- login ---------- */
+$("loginBtn").onclick = async () => {
+  $("loginMsg").textContent = "";
+  try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
+  catch (e) { $("loginMsg").textContent = "Login failed. Check email and password."; }
+};
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("loginBtn").click(); });
+$("outBtn").onclick = () => signOut(auth);
+onAuthStateChanged(auth, u => {
+  $("login").hidden = !!u;
+  $("app").hidden = !u;
+  if (u) { $("who").textContent = u.email; loadRepCount(); }
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll("main section").forEach(s => s.classList.toggle("on", s.id === "tab-" + b.dataset.tab));
+  if (b.dataset.tab === "saved") loadSaved();
+  if (b.dataset.tab === "rep") loadReports();
+  if (b.dataset.tab === "codes") loadCodes();
+});
+function showTab(t) { document.querySelector(`nav button[data-tab="${t}"]`).click(); }
+
+/* ---------- generate ---------- */
+function setStatus(id, t, cls) { const e = $(id); e.textContent = t; e.className = "status " + (cls || ""); }
+$("genBtn").onclick = async () => {
+  const classNo = +$("gClass").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
+  const counts = { mcq: +$("cMcq").value || 0, ar: +$("cAr").value || 0, short: +$("cShort").value || 0, long: +$("cLong").value || 0 };
+  const total = counts.mcq + counts.ar + counts.short + counts.long;
+  if (topic.length < 2) return setStatus("genStatus", "Type the topic name.", "err");
+  if (total < 1 || total > 30) return setStatus("genStatus", "Total questions must be 1 to 30.", "err");
+  if (WORKER_URL.includes("PASTE_")) return setStatus("genStatus", "The AI service address is not set yet.", "err");
+  $("genBtn").disabled = true;
+  setStatus("genStatus", "Writing the paper, then a second AI checks it. Please wait 1 to 2 minutes and do not close this page...");
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    const r = await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken, classNo, subject, topic, counts }) });
+    const j = await r.json();
+    if (!j.ok) { setStatus("genStatus", j.error || "Could not make the paper.", "err"); return; }
+    cur = { id: null, classNo, subject, topic, mode: $("gMode").value, questions: j.questions };
+    renderEditor(j.warnings || [], j.changes || [], j.writer, j.checker);
+    setStatus("genStatus", "Paper ready. Read it below, edit if needed, then click Save.", "ok");
+    $("editor").scrollIntoView({ behavior: "smooth" });
+  } catch (e) {
+    setStatus("genStatus", "Could not reach the AI service. Check the internet and try again.", "err");
+  } finally { $("genBtn").disabled = false; }
+};
+
+/* ---------- editor ---------- */
+function ta(i, f, v, rows) { return `<textarea data-i="${i}" data-f="${f}" rows="${rows || 2}">${esc(v)}</textarea>`; }
+function letters(i, v) { return `<select data-i="${i}" data-f="answer">${["A","B","C","D"].map(l => `<option ${l === v ? "selected" : ""}>${l}</option>`).join("")}</select>`; }
+function card(q, i) {
+  let h = `<div class="q"><h4><span>Q${i + 1} · ${TYPE_NAME[q.type]}</span><button class="del" data-del="${i}">Delete</button></h4>`;
+  if (q.type === "mcq") {
+    h += `<label>Question</label>${ta(i, "q", q.q)}`;
+    (q.options || []).forEach((o, k) => { h += `<label>Option ${"ABCD"[k]}</label><input data-i="${i}" data-o="${k}" value="${esc(o)}">`; });
+    h += `<label>Correct answer</label>${letters(i, q.answer)}<label>Explanation</label>${ta(i, "explanation", q.explanation)}`;
+  } else if (q.type === "ar") {
+    h += `<label>Assertion (A)</label>${ta(i, "assertion", q.assertion)}<label>Reason (R)</label>${ta(i, "reason", q.reason)}`;
+    h += `<label>Correct answer (A: both true and R explains A · B: both true, R does not explain A · C: A true, R false · D: A false, R true)</label>${letters(i, q.answer)}<label>Explanation</label>${ta(i, "explanation", q.explanation)}`;
+  } else {
+    h += `<label>Question</label>${ta(i, "q", q.q)}<label>Answer</label>${ta(i, "answer", q.answer, q.type === "long" ? 6 : 3)}`;
+  }
+  return h + "</div>";
+}
+function renderEditor(warnings, changes, writer, checker) {
+  if (!cur) { $("editor").hidden = true; return; }
+  $("editor").hidden = false;
+  $("edTitle").textContent = `Class ${cur.classNo} · ${cur.subject} · ${cur.topic} · ${cur.mode === "practice" ? "Practice paper" : "Question paper"}`;
+  let n = "";
+  (warnings || []).forEach(w => n += `<div class="warn">⚠️ ${esc(w)}</div>`);
+  if (changes && changes.length) n += `<div class="warn"><b>The second AI fixed these:</b><br>${changes.map(esc).join("<br>")}</div>`;
+  if (writer) n += `<p class="small">Written by ${esc(writer)}${checker ? ", checked by " + esc(checker) : ""}.</p>`;
+  $("notes").innerHTML = n;
+  $("qs").innerHTML = cur.questions.map(card).join("");
+  setStatus("saveStatus", "");
+}
+$("qs").addEventListener("input", e => {
+  const t = e.target, i = +t.dataset.i;
+  if (isNaN(i) || !cur) return;
+  if (t.dataset.o !== undefined) cur.questions[i].options[+t.dataset.o] = t.value;
+  else cur.questions[i][t.dataset.f] = t.value;
+});
+$("qs").addEventListener("click", e => {
+  const b = e.target.closest("[data-del]");
+  if (!b || !cur) return;
+  if (!confirm("Delete this question?")) return;
+  cur.questions.splice(+b.dataset.del, 1);
+  renderEditor([], [], "", "");
+});
+$("cancelBtn").onclick = () => { cur = null; renderEditor(); setStatus("genStatus", ""); };
+$("saveBtn").onclick = async () => {
+  if (!cur || !cur.questions.length) return setStatus("saveStatus", "There are no questions to save.", "err");
+  $("saveBtn").disabled = true;
+  try {
+    const data = { classNo: cur.classNo, subject: cur.subject, topic: cur.topic, mode: cur.mode, questions: cur.questions,
+      title: `Class ${cur.classNo} ${cur.subject} - ${cur.topic}`, createdBy: auth.currentUser.email, updatedAt: serverTimestamp() };
+    if (cur.id) await setDoc(doc(db, "papers", cur.id), data);
+    else { data.createdAt = serverTimestamp(); const r = await addDoc(collection(db, "papers"), data); cur.id = r.id; }
+    setStatus("saveStatus", "Saved. Students can now open it with the class code.", "ok");
+  } catch (e) { setStatus("saveStatus", "Save failed: " + e.message, "err"); }
+  finally { $("saveBtn").disabled = false; }
+};
+
+/* ---------- saved papers ---------- */
+async function loadSaved() {
+  $("savedList").textContent = "Loading...";
+  try {
+    const snap = await getDocs(collection(db, "papers"));
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => ((b.updatedAt && b.updatedAt.toMillis && b.updatedAt.toMillis()) || 0) - ((a.updatedAt && a.updatedAt.toMillis && a.updatedAt.toMillis()) || 0));
+    if (!rows.length) { $("savedList").textContent = "No saved papers yet."; return; }
+    $("savedList").innerHTML = rows.map(p => `<div class="item"><div><b>${esc(p.title)}</b><br><span class="small">${p.mode === "practice" ? "Practice paper" : "Question paper"} · ${(p.questions || []).length} questions · ${esc(p.createdBy || "")}</span></div>
+      <div><button class="sec" data-edit="${p.id}">Open / Edit</button> <button class="del" data-rm="${p.id}">Delete</button></div></div>`).join("");
+  } catch (e) { $("savedList").textContent = "Could not load: " + e.message; }
+}
+async function openPaper(id) {
+  const s = await getDoc(doc(db, "papers", id));
+  if (!s.exists()) { alert("This paper was deleted."); return; }
+  const p = s.data();
+  cur = { id, classNo: p.classNo, subject: p.subject, topic: p.topic, mode: p.mode, questions: p.questions || [] };
+  showTab("gen");
+  renderEditor([], [], "", "");
+  $("editor").scrollIntoView({ behavior: "smooth" });
+}
+$("savedList").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-edit]"), rm = e.target.closest("[data-rm]");
+  if (ed) openPaper(ed.dataset.edit);
+  if (rm && confirm("Delete this saved paper permanently?")) { await deleteDoc(doc(db, "papers", rm.dataset.rm)); loadSaved(); }
+});
+
+/* ---------- reports ---------- */
+async function loadRepCount() {
+  try { const s = await getDocs(collection(db, "reports")); $("repN").textContent = s.size ? "(" + s.size + ")" : ""; } catch (e) {}
+}
+async function loadReports() {
+  $("repList").textContent = "Loading...";
+  try {
+    const snap = await getDocs(collection(db, "reports"));
+    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    $("repN").textContent = rows.length ? "(" + rows.length + ")" : "";
+    if (!rows.length) { $("repList").textContent = "No reports."; return; }
+    $("repList").innerHTML = rows.map(r => `<div class="item"><div><b>${esc(r.title)}</b> · Question ${esc(r.qNo)}<br><span class="small">${esc(r.note)}</span></div>
+      <div><button class="sec" data-edit="${esc(r.paperId)}">Open paper</button> <button class="del" data-rr="${r.id}">Done</button></div></div>`).join("");
+  } catch (e) { $("repList").textContent = "Could not load: " + e.message; }
+}
+$("repList").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-edit]"), rr = e.target.closest("[data-rr]");
+  if (ed) openPaper(ed.dataset.edit);
+  if (rr) { await deleteDoc(doc(db, "reports", rr.dataset.rr)); loadReports(); }
+});
+
+/* ---------- class codes ---------- */
+async function sha(s) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+async function loadCodes() {
+  let saved = {};
+  try { const s = await getDoc(doc(db, "private", "classCodes")); if (s.exists()) saved = s.data(); } catch (e) {}
+  $("codeBox").innerHTML = CLASSES.map(c => `<label>Class ${c} code</label><input data-c="${c}" value="${esc(saved[c] || "")}" placeholder="Example: green9">`).join("");
+  setStatus("codeStatus", "");
+}
+$("codeSave").onclick = async () => {
+  const plain = {}, hashes = {};
+  for (const inp of $("codeBox").querySelectorAll("input")) {
+    const c = inp.dataset.c, v = inp.value.trim();
+    if (v.length < 4) return setStatus("codeStatus", `Class ${c} code needs at least 4 letters or numbers.`, "err");
+    plain[c] = v;
+    hashes[c] = await sha(c + ":" + v.toLowerCase());
+  }
+  try {
+    await setDoc(doc(db, "private", "classCodes"), plain);
+    await setDoc(doc(db, "settings", "classCodeHashes"), hashes);
+    setStatus("codeStatus", "Saved. Give each class its own code.", "ok");
+  } catch (e) { setStatus("codeStatus", "Save failed: " + e.message, "err"); }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>MIRS Practice Papers</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#f3f4f8;color:#172554}
+header{background:#4f46e5;color:#fff;padding:14px 18px}
+header h1{margin:0;font-size:20px}
+main{max-width:820px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select{width:100%;padding:10px;border:1px solid #c7c9d9;border-radius:8px;font:inherit}
+button{font:inherit;cursor:pointer}
+.go{background:#4f46e5;color:#fff;border:0;padding:11px 20px;border-radius:10px;font-weight:700;margin-top:14px}
+.sec{background:#fff;color:#4f46e5;border:1px solid #4f46e5;padding:8px 14px;border-radius:8px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{background:#eef0ff;color:#312e81;border:0;padding:10px 16px;border-radius:999px;font-weight:600}
+.chips button.on{background:#4f46e5;color:#fff}
+.err{color:#b91c1c;font-weight:600}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #eee;flex-wrap:wrap}
+.item:last-child{border:0}
+.small{font-size:13px;color:#555}
+.q{margin:18px 0;padding-bottom:12px;border-bottom:1px dashed #ccd}
+.q p{margin:6px 0}
+.opt{margin:4px 0 4px 14px}
+.ans{background:#ecfdf5;border-left:4px solid #16a34a;padding:8px 10px;margin-top:8px;border-radius:6px;font-size:15px}
+.rep{font-size:13px;margin-top:6px}
+.rep button{background:none;border:0;color:#b91c1c;text-decoration:underline;padding:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+[hidden]{display:none!important}
+@media print{
+  header,.noprint,.rep,.bar{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;padding:0}
+  .ans{border:1px solid #999;background:#fff}
+}
+</style>
+</head>
+<body>
+<header><h1>MIRS Practice Papers</h1></header>
+<main>
+
+<div id="s1" class="card">
+  <label>Class</label>
+  <select id="cls"><option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option></select>
+  <label>Class code (your teacher will give it)</label>
+  <input id="code" placeholder="Type the code" autocomplete="off">
+  <button id="openBtn" class="go">Open</button>
+  <p id="s1msg" class="err"></p>
+</div>
+
+<div id="s2" class="card" hidden>
+  <div class="bar"><button id="back1" class="sec">← Change class</button></div>
+  <h3 id="s2title"></h3>
+  <label>Choose subject</label>
+  <div id="subs" class="chips"></div>
+  <div id="list" style="margin-top:14px"></div>
+</div>
+
+<div id="s3" class="card" hidden>
+  <div class="bar noprint"><button id="back2" class="sec">← Back to list</button><button id="printBtn" class="sec">Print</button></div>
+  <h2 id="ptitle"></h2>
+  <p id="pinfo" class="small"></p>
+  <div id="paper"></div>
+  <p class="small noprint">Papers are prepared with AI help and reviewed by teachers. If you find a mistake, tap "Report a wrong question".</p>
+</div>
+
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y",
+  authDomain: "mirs-ai.firebaseapp.com",
+  projectId: "mirs-ai",
+  storageBucket: "mirs-ai.firebasestorage.app",
+  messagingSenderId: "478184601355",
+  appId: "1:478184601355:web:85f99d485db2e12860940e"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nl = s => esc(s).replace(/\n/g, "<br>");
+const SUBJECTS = ["Physics","Chemistry","Biology","Mathematics","Social"];
+const AR_OPTS = {
+  A: "Both A and R are true, and R is the correct explanation of A.",
+  B: "Both A and R are true, but R is not the correct explanation of A.",
+  C: "A is true, but R is false.",
+  D: "A is false, but R is true."
+};
+let classNo = 0, subject = "", papers = [], open = null;
+
+async function sha(s) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+function show(id) { ["s1","s2","s3"].forEach(x => $(x).hidden = x !== id); window.scrollTo(0, 0); }
+
+/* ---------- step 1: class code ---------- */
+$("openBtn").onclick = async () => {
+  const c = +$("cls").value, v = $("code").value.trim().toLowerCase();
+  $("s1msg").textContent = "";
+  if (!v) { $("s1msg").textContent = "Type the class code."; return; }
+  $("openBtn").disabled = true;
+  try {
+    const s = await getDoc(doc(db, "settings", "classCodeHashes"));
+    const want = s.exists() ? s.data()[c] : null;
+    if (!want) { $("s1msg").textContent = "Codes are not ready yet. Ask your teacher."; return; }
+    if (want !== await sha(c + ":" + v)) { $("s1msg").textContent = "Wrong code for this class."; return; }
+    classNo = c; subject = "";
+    $("s2title").textContent = "Class " + c;
+    $("subs").innerHTML = SUBJECTS.map(x => `<button data-s="${x}">${x}</button>`).join("");
+    $("list").innerHTML = "";
+    show("s2");
+  } catch (e) { $("s1msg").textContent = "Could not connect. Check the internet and try again."; }
+  finally { $("openBtn").disabled = false; }
+};
+$("code").addEventListener("keydown", e => { if (e.key === "Enter") $("openBtn").click(); });
+$("back1").onclick = () => { $("code").value = ""; show("s1"); };
+
+/* ---------- step 2: subject and list ---------- */
+$("subs").addEventListener("click", async e => {
+  const b = e.target.closest("[data-s]"); if (!b) return;
+  subject = b.dataset.s;
+  $("subs").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+  $("list").textContent = "Loading...";
+  try {
+    const snap = await getDocs(query(collection(db, "papers"), where("classNo", "==", classNo), where("subject", "==", subject)));
+    papers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    papers.sort((a, b) => String(a.topic).localeCompare(String(b.topic)));
+    $("list").innerHTML = papers.length
+      ? papers.map((p, i) => `<div class="item"><div><b>${esc(p.topic)}</b><br><span class="small">${p.mode === "practice" ? "Practice paper" : "Question paper"} · ${(p.questions || []).length} questions</span></div><button class="sec" data-p="${i}">Open</button></div>`).join("")
+      : "<p class='small'>No papers for this subject yet.</p>";
+  } catch (err) { $("list").textContent = "Could not load papers. Try again."; }
+});
+$("list").addEventListener("click", e => {
+  const b = e.target.closest("[data-p]"); if (!b) return;
+  open = papers[+b.dataset.p]; renderPaper(); show("s3");
+});
+$("back2").onclick = () => show("s2");
+$("printBtn").onclick = () => window.print();
+
+/* ---------- step 3: paper ---------- */
+function optText(q, l) { return q.type === "mcq" ? (q.options || [])["ABCD".indexOf(l)] : AR_OPTS[l]; }
+function ansHTML(q) {
+  if (q.type === "mcq" || q.type === "ar") {
+    return `<b>Answer: (${esc(q.answer)})</b> ${esc(optText(q, q.answer))}` + (q.explanation ? `<br>${nl(q.explanation)}` : "");
+  }
+  return `<b>Answer:</b><br>${nl(q.answer)}`;
+}
+function qHTML(q, i, practice) {
+  let h = `<div class="q"><p><b>Q${i + 1}.</b> `;
+  if (q.type === "ar") {
+    h += `<b>Assertion (A):</b> ${nl(q.assertion)}</p><p><b>Reason (R):</b> ${nl(q.reason)}</p>`;
+    h += ["A","B","C","D"].map(l => `<div class="opt">(${l}) ${esc(AR_OPTS[l])}</div>`).join("");
+  } else {
+    h += `${nl(q.q)}</p>`;
+    if (q.type === "mcq") h += (q.options || []).map((o, k) => `<div class="opt">(${"ABCD"[k]}) ${esc(o)}</div>`).join("");
+  }
+  if (practice) h += `<div class="ans">${ansHTML(q)}</div>`;
+  h += `<div class="rep"><button data-r="${i}">Report a wrong question</button></div></div>`;
+  return h;
+}
+function renderPaper() {
+  const p = open, practice = p.mode === "practice", qs = p.questions || [];
+  $("ptitle").textContent = `Class ${p.classNo} · ${p.subject} · ${p.topic}`;
+  $("pinfo").textContent = practice ? "Practice paper: the answer is given after each question." : "Question paper: answers are given at the end.";
+  let h = qs.map((q, i) => qHTML(q, i, practice)).join("");
+  if (!practice) h += `<h3>Answer Key</h3>` + qs.map((q, i) => `<div class="ans" style="margin-bottom:8px"><b>Q${i + 1}.</b> ${ansHTML(q)}</div>`).join("");
+  $("paper").innerHTML = h;
+}
+$("paper").addEventListener("click", async e => {
+  const b = e.target.closest("[data-r]"); if (!b || !open) return;
+  const note = prompt("What is wrong with this question? (short note)");
+  if (!note || !note.trim()) return;
+  try {
+    await addDoc(collection(db, "reports"), { paperId: open.id, title: open.title || open.topic, qNo: +b.dataset.r + 1, note: note.trim().slice(0, 300), createdAt: new Date().toISOString() });
+    b.textContent = "Reported. Thank you."; b.disabled = true;
+  } catch (err) { alert("Could not send the report. Try again."); }
+});
+</script>
+</body>
+</html>
