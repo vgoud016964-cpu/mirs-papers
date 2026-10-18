@@ -69,7 +69,20 @@ button{font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s,bac
     <h3 style="margin:0 0 5px">🧠 Ask Anything Educational</h3>
     <p style="font-size:13px;color:var(--muted);margin:0 0 10px">Need help with a concept, formula, or fact? Ask here (School topics only).</p>
    <textarea id="askInput" placeholder="Type your question here..."></textarea>
-<button id="askBtn" class="go">Ask AI</button>
+<script>
+  let askTimer = null;
+  document.getElementById("askBtn").addEventListener("click", () => {
+    clearTimeout(askTimer);
+    askTimer = setTimeout(() => {
+      const btn = document.getElementById("askBtn");
+      if (btn.textContent.includes("Thinking")) {
+        btn.disabled = false;
+        btn.textContent = "Ask AI";
+        document.getElementById("askAnswer").textContent = "The AI took too long. You may have hit the free daily limit. Please try again tomorrow.";
+      }
+    }, 15000);
+  });
+</script>
 <div id="askAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;;min-height: 100px; overflow-y: auto
 <!-- Subject List Screen -->
 <div id="s2" class="card" hidden>
