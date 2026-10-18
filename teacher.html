@@ -6,53 +6,81 @@
 <meta name="robots" content="noindex">
 <title>MIRS Practice Papers - Teacher</title>
 <style>
+
 *{box-sizing:border-box}
-:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--primary-dark:#342e9f;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--soft:#f0efff;--shadow:0 10px 30px rgba(38,39,94,.08)}
+:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--primary-dark:#342e9f;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--soft:#f0efff;--shadow:0 10px 30px rgba(38,39,94,.08)}
 body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:linear-gradient(115deg,#25245d 0%,#4b43c7 64%,#167e99 100%);color:#fff;padding:19px max(18px,calc((100% - 1060px)/2));box-shadow:0 8px 24px rgba(43,42,121,.18)}
 header h1{font-size:clamp(18px,2.5vw,24px);margin:0;font-weight:760;letter-spacing:-.4px}
 header span{font-size:13px;opacity:.92}
-nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px max(18px,calc((100% - 1060px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid #e2e7f2;position:sticky;top:0;z-index:10}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px max(18px,calc((100% - 1060px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid #e2e7f2;box-shadow:0 4px 14px rgba(25,36,75,.035);position:sticky;top:0;z-index:10}
 nav button{background:#f2f2ff;color:#45409f;border:1px solid transparent;padding:10px 15px;border-radius:10px;font-weight:700;cursor:pointer}
+nav button:hover{background:#e8e7ff}
 nav button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;box-shadow:0 4px 10px rgba(75,67,199,.2)}
 main{max-width:1020px;margin:26px auto;padding:0 18px 42px}
-section{display:none} section.on{display:block}
+section{display:none}
+section.on{display:block}
 .card{background:var(--surface);border:1px solid rgba(216,222,241,.95);border-radius:17px;padding:clamp(17px,2.7vw,24px);margin-bottom:17px;box-shadow:var(--shadow)}
 label{display:block;font-size:13px;font-weight:750;color:#384562;margin:13px 0 6px}
-input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit;transition:border-color .18s,box-shadow .18s}
+input::placeholder,textarea::placeholder{color:#9aa3b6}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(75,67,199,.13)}
 textarea{resize:vertical;min-height:76px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px}
-button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px}
+button{transition:transform .15s,box-shadow .15s,background .15s}
+button:focus-visible{outline:3px solid rgba(14,159,154,.35);outline-offset:2px}
+button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
+button.go:hover:not(:disabled){background:linear-gradient(115deg,#342e9f,#4b43c7);transform:translateY(-1px);box-shadow:0 8px 17px rgba(75,67,199,.23)}
+button.go:disabled{opacity:.55;cursor:wait}
 button.sec{background:#fff;color:#4b43c7;border:1px solid #cbc9f5;padding:8px 13px;border-radius:9px;cursor:pointer;font-weight:700}
-button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 11px;border-radius:9px;cursor:pointer}
+button.sec:hover{background:#f0efff;border-color:#a9a5ef}
+button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 11px;border-radius:9px;cursor:pointer;font-weight:650}
+button.del:hover{background:#ffebed}
 .status{margin-top:12px;font-weight:650}
 .err{color:#b42335}
 .ok{color:#13734d}
-.warn{background:#fff7e9;border:1px solid #f6d19a;border-radius:11px;padding:12px 14px;margin:12px 0;font-size:14px}
+.status.ok:not(:empty)::before{content:"\2705  "}
+.status.err:not(:empty)::before{content:"\26A0\FE0F  "}
+p.err:not(.status):not(:empty)::before{content:"\26A0\FE0F  "}
+.warn{background:#fff7e9;border:1px solid #f6d19a;border-radius:11px;padding:12px 14px;margin:12px 0;font-size:14px;color:#80551b}
 .q{border:1px solid #dfe2f2;border-radius:13px;padding:15px;margin:13px 0;background:linear-gradient(145deg,#fff,#fafaff)}
-.q h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.q h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:12px;color:#29295e}
 .small{font-size:13px;color:var(--muted)}
-.overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(22,32,76,.96),rgba(62,49,145,.94),rgba(15,111,133,.91));display:flex;align-items:center;justify-content:center;z-index:50}
-.box{background:#fff;padding:34px;border-radius:20px;width:390px;max-width:100%}
+.overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(22,32,76,.96),rgba(62,49,145,.94),rgba(15,111,133,.91));display:flex;align-items:center;justify-content:center;z-index:50;padding:18px}
+.box{background:#fff;padding:clamp(24px,4vw,34px);border:1px solid rgba(255,255,255,.45);box-shadow:0 24px 70px rgba(7,13,42,.28);border-radius:20px;width:390px;max-width:100%}
+.box h2{color:#202453;font-size:25px;letter-spacing:-.5px}
 .box input{margin-bottom:10px}
 .item{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid #e8ebf4}
+.item:last-child{border:0}
+h2,h3{color:#25265d;letter-spacing:-.35px}
+h2{font-size:clamp(21px,3vw,27px)}
 [hidden]{display:none!important}
+@media(max-width:620px){header{padding:16px;align-items:flex-start}header #outBtn{margin-left:auto}nav{padding:10px 12px;position:static}nav button{flex:1 1 auto;padding:10px 11px}main{margin:17px auto;padding:0 12px 28px}.card{border-radius:14px;padding:16px}button.go{max-width:100%}}
+
+.t-ill{background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f0f0ff'/><circle cx='50' cy='50' r='30' fill='%234b43c7' opacity='0.2'/></svg>") center/contain no-repeat;flex:none;width:150px;height:94px;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.75)}
+.t-ill-lg{width:100%;height:170px;margin:4px 0 12px;box-shadow:none;border:0;border-radius:0}
+.brand{display:flex;align-items:center;gap:16px}
+.brand .sub{font-size:13px;opacity:.92;margin-top:2px}
 </style>
 </head>
 <body>
 <div id="login" class="overlay"><div class="box">
+  <div class="t-ill t-ill-lg" role="img" aria-label="Teacher at a computer"></div>
   <h2 style="margin:0 0 14px">🔐 Teacher Login</h2>
-  <label>Email</label>
-  <input id="em" type="email" placeholder="Email" autocomplete="username">
+  <label>Email address</label>
+  <input id="em" type="email" placeholder="Type your email" autocomplete="username">
   <label>Password</label>
-  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
-  <button id="loginBtn" class="go" style="width:100%;margin-top:15px">🔓 Sign in</button>
+  <input id="pw" type="password" placeholder="Type your password" autocomplete="current-password">
+  <button id="loginBtn" class="go" style="width:100%;margin:0">🔓 Sign in</button>
   <p id="loginMsg" class="err"></p>
 </div></div>
 
 <div id="app" hidden>
 <header>
-  <div><h1>MIRS Practice Papers · Teacher</h1><div class="small" style="color:#fff">CBSE · Classes 6 to 10</div></div>
+  <div class="brand">
+    <div class="t-ill" role="img" aria-label="Teacher at a computer"></div>
+    <div><h1>MIRS Practice Papers · Teacher</h1><div class="sub">CBSE · Classes 6 to 10</div></div>
+  </div>
   <span id="who"></span><button id="outBtn" class="sec">🚪 Sign out</button>
 </header>
 
@@ -70,17 +98,17 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
       <div><label>🎓 Class</label><select id="gClass"></select></div>
       <div><label>🏫 Section</label><select id="gSection"></select></div>
       <div><label>📖 Subject</label><select id="gSub"></select></div>
-      <div><label>🧾 Type</label><select id="gMode"><option value="practice">📝 Practice paper</option><option value="question">📄 Question paper</option></select></div>
+      <div><label>🧾 Paper type</label><select id="gMode"><option value="practice">📝 Practice paper (answer after each question)</option><option value="question">📄 Question paper (answers at the end)</option></select></div>
     </div>
-    <label>🏷️ Topic</label>
+    <label>🏷️ Topic name</label>
     <input id="gTopic" placeholder="Example: Living Organisms" maxlength="120">
     <div class="row">
       <div><label>🔘 MCQ</label><input id="cMcq" type="number" min="0" max="30" value="5"></div>
       <div><label>🔗 Assertion-Reason</label><input id="cAr" type="number" min="0" max="30" value="2"></div>
-      <div><label>✏️ Short</label><input id="cShort" type="number" min="0" max="30" value="3"></div>
-      <div><label>📝 Long</label><input id="cLong" type="number" min="0" max="30" value="2"></div>
+      <div><label>✏️ Short answer</label><input id="cShort" type="number" min="0" max="30" value="3"></div>
+      <div><label>📝 Long answer</label><input id="cLong" type="number" min="0" max="30" value="2"></div>
     </div>
-    <p class="small">💡 The AI writes the paper. This can take 10-20 seconds.</p>
+    <p class="small">💡 Total questions: maximum 30. The AI writes the paper instantly.</p>
     <button id="genBtn" class="go">⚡ Generate paper</button>
     <p id="genStatus" class="status"></p>
   </div>
@@ -88,19 +116,19 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
   <div id="editor" class="card" hidden>
     <h3 id="edTitle" style="margin-top:0"></h3>
     <div id="notes"></div>
-    <p class="small">👀 Please read every question. You can edit or delete.</p>
+    <p class="small">👀 <b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
     <div id="qs"></div>
-    <button id="saveBtn" class="go">💾 Save paper</button>
-    <button id="cancelBtn" class="sec">✖️ Close</button>
+    <button id="saveBtn" class="go">💾 Save paper for students</button>
+    <button id="cancelBtn" class="sec" style="margin-left:8px">✖️ Close without saving</button>
     <p id="saveStatus" class="status"></p>
   </div>
 </section>
 
-<section id="tab-saved"><div class="card"><h3>🗂️ Saved papers</h3><div id="savedList">Loading...</div></div></section>
-<section id="tab-rep"><div class="card"><h3>🚩 Reports from students</h3><div id="repList">Loading...</div></div></section>
+<section id="tab-saved"><div class="card"><h3 style="margin-top:0">🗂️ Saved papers</h3><div id="savedList">Loading...</div></div></section>
+<section id="tab-rep"><div class="card"><h3 style="margin-top:0">🚩 Wrong-question reports from students</h3><div id="repList">Loading...</div></div></section>
 <section id="tab-codes"><div class="card">
-  <h3>🔑 Class & Section codes</h3>
-  <p class="small">Give each class its code. Students need it to open papers.</p>
+  <h3 style="margin-top:0">🔑 Class & Section codes</h3>
+  <p class="small">🏫 Give each class its own code and each section its own code. Students need both to open papers.</p>
   <div id="codeBox"></div>
   <button id="codeSave" class="go">💾 Save codes</button>
   <p id="codeStatus" class="status"></p>
