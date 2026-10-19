@@ -214,8 +214,9 @@ $("genBtn").onclick = async () => {
   setStatus("genStatus", "Writing the paper...");
   try {
     const idToken = await auth.currentUser.getIdToken();
+        const randomSeed = Math.random().toString(36).substring(7);
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ idToken, classNo, subject, topic, counts }) });
+      body: JSON.stringify({ idToken, classNo, subject, topic, counts, seed: randomSeed }) });
     const j = await r.json();
     if (!j.ok) { setStatus("genStatus", j.error || "Could not make the paper.", "err"); return; }
     cur = { id:null, classNo, section, subject, topic, mode:$("gMode").value, questions:j.questions };
