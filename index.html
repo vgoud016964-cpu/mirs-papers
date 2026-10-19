@@ -10,7 +10,7 @@
 :root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--shadow:0 10px 30px rgba(38,39,94,.08)}
 body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
 header{background:linear-gradient(115deg,#25245d 0%,#4b43c7 64%,#167e99 100%);color:#fff;padding:18px max(18px,calc((100% - 900px)/2));display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 24px rgba(43,42,121,.18)}
-header h1{margin:0;font-size:clamp(18px,2.5vw,22px)}
+header h1{margin:0;font-size:clamp(18px,2.5vw,22px); display:flex; align-items:center; gap:10px;}
 main{max-width:900px;margin:26px auto;padding:0 18px 42px}
 .card{background:#fff;border:1px solid rgba(216,222,241,.95);border-radius:16px;padding:clamp(18px,3vw,26px);margin-bottom:16px;box-shadow:var(--shadow)}
 h2{margin:0 0 14px;font-size:21px}
@@ -39,7 +39,13 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
 </style>
 </head>
 <body>
-<header><h1>📘 MIRS Practice Papers</h1><span class="small" style="color:#fff">Student portal</span></header>
+<header>
+  <h1>
+    <img src="book.jpg" style="height:35px; border-radius:5px;" alt="Logo">
+    MIRS Practice Papers
+  </h1>
+  <span class="small" style="color:#fff">Student portal</span>
+</header>
 <main>
 <section id="s1" class="card">
   <h2>🔐 Open a paper</h2>
@@ -67,6 +73,14 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
   <button id="printBtn" class="go">🖨️ Print</button>
   <button id="back2" class="sec">← Back</button>
 </section>
+
+<div class="card">
+  <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
+  <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
+  <textarea id="studentAskInput" placeholder="Type your question here..."></textarea>
+  <button id="studentAskBtn" class="go">🤖 Ask AI</button>
+  <div id="studentAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
+</div>
 </main>
 
 <script type="module">
@@ -91,10 +105,10 @@ $("sec").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(
 async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 function show(id){ ["s1","s2","s3"].forEach(x=>$(x).hidden = x!==id); window.scrollTo(0,0); }
 
-$("askBtn").onclick = async () => {
-  const q = $("askInput").value.trim();
+$("studentAskBtn").onclick = async () => {
+  const q = $("studentAskInput").value.trim();
   if (q.length<2) return;
-  const b=$("askBtn"), a=$("askAnswer");
+  const b=$("studentAskBtn"), a=$("studentAskAnswer");
   b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
   
   const askTimer = setTimeout(() => {
