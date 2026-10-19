@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
 <title>MIRS Practice Papers | Student Portal</title>
 <style>
 *{box-sizing:border-box}
@@ -16,6 +17,7 @@ h2{margin:0 0 14px;font-size:21px}
 label{display:block;font-size:13px;font-weight:750;color:#384562;margin:12px 0 6px}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
 textarea{min-height:76px;resize:vertical}
+textarea.auto-expand{resize:none;overflow:hidden;min-height:44px;}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
 button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:14px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
 button.go:disabled{opacity:.55;cursor:wait}
@@ -101,6 +103,16 @@ let classNo=0, section="All", subject="", papers=[], open=null;
 
 $("sec").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(x=>`<option value="${x}">${x}</option>`).join("");
 
+function autoExpand(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+document.addEventListener('input', e => {
+  if (e.target.tagName.toLowerCase() === 'textarea' && e.target.classList.contains('auto-expand')) {
+    autoExpand(e.target);
+  }
+});
+
 async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 function show(id){ ["s1","s2","s3"].forEach(x=>$(x).hidden = x!==id); window.scrollTo(0,0); }
 
@@ -169,18 +181,7 @@ $("list").addEventListener("click", e => {
 $("back1").onclick = () => show("s1");
 $("back2").onclick = () => show("s2");
 $("printBtn").onclick = () => window.print();
-$("paper").addEventListener("click", e => {
-  if (e.target.id === "toggleKeyBtn") {
-    const sec = document.getElementById("answerKeySection");
-    if (sec.style.display === "none") {
-      sec.style.display = "block";
-      e.target.textContent = "🙈 Hide Answer Key";
-    } else {
-      sec.style.display = "none";
-      e.target.textContent = "🔑 Show Answer Key";
-    }
-  }
-});
+
 function renderPaper(){
   const p=open, practice=p.mode==="practice", qs=p.questions||[];
   $("ptitle").textContent = `📘 Class ${p.classNo} · ${p.subject} · ${p.topic}`;
@@ -194,17 +195,12 @@ function renderPaper(){
       x += `${nl(q.q)}</p>`;
       if (q.type==="mcq") x += (q.options||[]).map((o,k)=>`<div class="opt">(${"ABCD"[k]}) ${esc(o)}</div>`).join("");
     }
-        if (practice) {
-      // Show answer and explanation right below the question for Practice Paper
-      x += `<div class="ans">✅ <b>Answer (${esc(q.answer)})</b><br>${nl(q.explanation||q.answer)}</div>`;
-    }
-    
+    if (practice) x += `<div class="ans">✅ <b>Answer (${esc(q.answer)})</b><br>${nl(q.explanation||q.answer)}</div>`;
     x += `<div class="rep"><button data-r="${i}">🚩 Report</button></div></div>`;
     return x;
   }).join("");
   
-  // Show the Answer Key at the end ONLY if it is a Question paper
-    if (!practice){
+  if (!practice){
     h += `<div class="noprint" style="margin-top:20px; text-align:center;">
             <button id="toggleKeyBtn" class="go" style="background:linear-gradient(115deg,#16a34a,#22c55e);">🔑 Show Answer Key</button>
           </div>
@@ -224,11 +220,24 @@ function renderPaper(){
       </div>`;
     }).join("") + `</div>`;
   }
-  h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
+  
+  h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" class="auto-expand" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
 }
 
 $("paper").addEventListener("click", async e => {
+  if (e.target.id === "toggleKeyBtn") {
+    const sec = document.getElementById("answerKeySection");
+    if (sec.style.display === "none") {
+      sec.style.display = "block";
+      e.target.textContent = "🙈 Hide Answer Key";
+    } else {
+      sec.style.display = "none";
+      e.target.textContent = "🔑 Show Answer Key";
+    }
+    return;
+  }
+
   const ask = e.target.closest("#studentDoubtBtn");
   if (ask && open){
     const question = $("studentDoubtQuestion").value.trim();
@@ -244,20 +253,19 @@ $("paper").addEventListener("click", async e => {
     finally { ask.disabled=false; ask.textContent="🤖 Ask AI"; }
     return;
   }
-    const b = e.target.closest("[data-r]"); if (!b||!open) return;
+  
+  const b = e.target.closest("[data-r]"); if (!b||!open) return;
   const note = prompt("What is wrong with this question?"); if (!note) return;
   
   b.textContent = "⏳ AI Checking..."; 
   b.disabled = true;
   
   try {
-    // Ask the AI to verify the report first
     const qData = open.questions[+b.dataset.r];
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ action:"verifyReport", classNo:Number(open.classNo), subject:String(open.subject||""), topic:String(open.topic||""), questionData: qData }) });
     const j = await r.json();
     
-    // If AI says the question is actually correct, block the report
     if (j.ok && j.isWrong === false) {
        alert("AI Check: This question is correct. Reason: " + j.reason);
        b.textContent = "🚩 Report"; 
@@ -265,7 +273,6 @@ $("paper").addEventListener("click", async e => {
        return;
     }
     
-    // If AI agrees it might be wrong (or if AI fails), send the report
     await addDoc(collection(db,"reports"), { paperId:open.id, title:open.title||open.topic, qNo:+b.dataset.r+1, note:note.trim().slice(0,300), createdAt:new Date().toISOString() });
     b.textContent = "✅ Reported";
   } catch { 
