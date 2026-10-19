@@ -230,12 +230,35 @@ $("paper").addEventListener("click", async e => {
     finally { ask.disabled=false; ask.textContent="🤖 Ask AI"; }
     return;
   }
-  const b = e.target.closest("[data-r]"); if (!b||!open) return;
+    const b = e.target.closest("[data-r]"); if (!b||!open) return;
   const note = prompt("What is wrong with this question?"); if (!note) return;
+  
+  b.textContent = "⏳ AI Checking..."; 
+  b.disabled = true;
+  
   try {
+    // Ask the AI to verify the report first
+    const qData = open.questions[+b.dataset.r];
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ action:"verifyReport", classNo:Number(open.classNo), subject:String(open.subject||""), topic:String(open.topic||""), questionData: qData }) });
+    const j = await r.json();
+    
+    // If AI says the question is actually correct, block the report
+    if (j.ok && j.isWrong === false) {
+       alert("AI Check: This question is correct. Reason: " + j.reason);
+       b.textContent = "🚩 Report"; 
+       b.disabled = false;
+       return;
+    }
+    
+    // If AI agrees it might be wrong (or if AI fails), send the report
     await addDoc(collection(db,"reports"), { paperId:open.id, title:open.title||open.topic, qNo:+b.dataset.r+1, note:note.trim().slice(0,300), createdAt:new Date().toISOString() });
-    b.textContent="✅ Reported"; b.disabled=true;
-  } catch { alert("Could not send report."); }
+    b.textContent = "✅ Reported";
+  } catch { 
+    alert("Could not send report."); 
+    b.textContent = "🚩 Report"; 
+    b.disabled = false;
+  }
 });
 </script>
 </body>
