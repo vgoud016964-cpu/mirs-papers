@@ -4,271 +4,216 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>MIRS Practice Papers</title>
+<title>MIRS Practice Papers - Student</title>
 <style>
 *{box-sizing:border-box}
-:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#2457d6;--primary-dark:#183fa8;--teal:#0e9f9a;--line:#dce5f2;--surface:#fff;--bg:#f3f7fc;--soft:#edf3ff;--shadow:0 12px 32px rgba(28,52,95,.08)}
-body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e5efff 0,transparent 42%),var(--bg);color:var(--ink);line-height:1.55}
-header{background:linear-gradient(115deg,#142c58 0%,#2457d6 68%,#147f9a 100%);color:#fff;padding:23px max(20px,calc((100% - 1000px)/2));box-shadow:0 8px 24px rgba(24,63,130,.18);position:relative;overflow:hidden}
-header:after{content:"";position:absolute;width:220px;height:220px;border:1px solid rgba(255,255,255,.14);border-radius:50%;right:8%;top:-145px;box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 56px rgba(255,255,255,.025);pointer-events:none}
-header h1{margin:0;font-size:clamp(21px,3vw,28px);letter-spacing:-.5px;font-weight:750;position:relative;z-index:1}
-main{max-width:900px;margin:30px auto;padding:0 18px 40px}
-.card{background:var(--surface);border:1px solid rgba(211,223,241,.9);border-radius:18px;padding:clamp(18px,3vw,26px);margin-bottom:18px;box-shadow:var(--shadow)}
-label{display:block;font-size:13px;font-weight:700;color:#344563;margin:13px 0 6px}
-input,select,textarea{width:100%;padding:12px 14px;border:1px solid #cbd7e8;border-radius:10px;background:#fff;color:var(--ink);font:inherit;transition:border-color .18s,box-shadow .18s}
-textarea{resize:vertical;min-height:100px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(36,87,214,.13)}
-button{font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s}
-.go{background:linear-gradient(115deg,var(--primary),#3477ed);color:#fff;border:0;padding:12px 22px;border-radius:10px;font-weight:750;margin-top:16px;box-shadow:0 6px 14px rgba(36,87,214,.2)}
-.go:hover{background:linear-gradient(115deg,var(--primary-dark),var(--primary));transform:translateY(-1px);box-shadow:0 9px 18px rgba(36,87,214,.24)}
-.sec{background:#fff;color:var(--primary);border:1px solid #cbd8f2;padding:9px 14px;border-radius:10px;font-weight:700}
-.sec:hover{background:var(--soft);border-color:#9bb5ed}
-.q{margin:20px 0;padding:0 0 18px;border-bottom:1px solid #e5ebf4}
-.opt{margin:7px 0 7px 14px;color:#344563}
-.ans{background:#eafaf4;border:1px solid #c7f0df;border-left:4px solid #12a276;padding:11px 13px;margin-top:10px;border-radius:10px;font-size:15px;color:#14543f}
-.rep{font-size:13px;margin-top:8px}
-.rep button{background:none;border:0;color:#b42335;text-decoration:underline;padding:2px;font-weight:650}
-.err{color:#b42335;font-weight:650}
+:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--shadow:0 10px 30px rgba(38,39,94,.08)}
+body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(115deg,#25245d 0%,#4b43c7 64%,#167e99 100%);color:#fff;padding:18px max(18px,calc((100% - 900px)/2));display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 24px rgba(43,42,121,.18)}
+header h1{margin:0;font-size:clamp(18px,2.5vw,22px)}
+main{max-width:900px;margin:26px auto;padding:0 18px 42px}
+.card{background:#fff;border:1px solid rgba(216,222,241,.95);border-radius:16px;padding:clamp(18px,3vw,26px);margin-bottom:16px;box-shadow:var(--shadow)}
+h2{margin:0 0 14px;font-size:21px}
+label{display:block;font-size:13px;font-weight:750;color:#384562;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+textarea{min-height:76px;resize:vertical}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:14px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
+button.go:disabled{opacity:.55;cursor:wait}
+button.sec{background:#fff;color:#4b43c7;border:1px solid #cbc9f5;padding:8px 13px;border-radius:9px;cursor:pointer;font-weight:700}
+button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-color:transparent}
+.small{font-size:13px;color:var(--muted)}
+.status{margin-top:10px;font-weight:650}
+.status.err{color:#b42335}
+.item{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e8ebf4}
+.item:last-child{border:0}
+.q{border:1px solid #dfe2f2;border-radius:13px;padding:15px;margin:12px 0;background:linear-gradient(145deg,#fff,#fafaff)}
+.opt{margin:4px 0 0 18px}
+.ans{background:#eefbf2;border-left:4px solid #16a34a;padding:10px 12px;border-radius:8px;margin-top:10px;white-space:pre-wrap}
+.rep{margin-top:10px}
+.rep button{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:650}
+.doubt-card{background:#f7f7ff;border:1px solid #d9d9f7;border-radius:14px;padding:14px;margin:14px 0}
+.doubt-answer{white-space:pre-wrap;margin-top:10px;min-height:22px}
 [hidden]{display:none!important}
-@media(max-width:600px){.go{width:100%}}
+@media print{.noprint,header,.rep{display:none!important}body{background:#fff}.card{box-shadow:none;border:0}}
 </style>
 </head>
 <body>
-<header>
-  <div style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
-    <img src="book.jpg" alt="Book" width="68" height="68" style="border-radius:16px;border:2px solid rgba(255,255,255,.7);">
-    <div>
-      <h1>MIRS Practice Papers</h1>
-      <p style="margin:2px 0 0;font-size:13px;opacity:.92">CBSE · Classes 6 to 10</p>
-    </div>
-  </div>
-</header>
-
+<header><h1>📘 MIRS Practice Papers</h1><span class="small" style="color:#fff">Student portal</span></header>
 <main>
-<!-- Login Screen -->
-<div id="s1" class="card">
-  <label>🎓 Class</label>
-  <select id="cls"><option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option></select>
-  
-  <label>🏫 Section</label>
-  <select id="sec"><option value="All">All sections</option></select>
-  
-  <label>🔑 Class code</label>
-  <input id="code" placeholder="Type the class code" autocomplete="off">
-  
-  <label>🔑 Section code</label>
-  <input id="scode" placeholder="Type the section code" autocomplete="off">
-  
-  <button id="openBtn" class="go">🔓 Open Papers</button>
-  <p id="s1msg" class="err"></p>
-
-  <hr style="border:0;border-top:1px solid #e5ebf4;margin:24px 0">
-  
-  <!-- Ask Anything Box -->
-  <div style="background:linear-gradient(135deg,#f8fbff,#f0f8ff);padding:18px;border-radius:14px;border:1px solid #cddcf6;">
-    <h3 style="margin:0 0 5px">🧠 Ask Anything Educational</h3>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 10px">Need help with a concept, formula, or fact? Ask here (School topics only).</p>
-   <textarea id="askInput" placeholder="Type your question here..."></textarea>
-<script>
-  let askTimer = null;
-  document.getElementById("askBtn").addEventListener("click", () => {
-    clearTimeout(askTimer);
-    askTimer = setTimeout(() => {
-      const btn = document.getElementById("askBtn");
-      if (btn.textContent.includes("Thinking")) {
-        btn.disabled = false;
-        btn.textContent = "Ask AI";
-        document.getElementById("askAnswer").textContent = "The AI took too long. You may have hit the free daily limit. Please try again tomorrow.";
-      }
-    }, 15000);
-  });
-</script>
-<div id="askAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;;min-height: 100px; overflow-y: auto
-<!-- Subject List Screen -->
-<div id="s2" class="card" hidden>
-  <button id="back1" class="sec">← Change class</button>
-  <h3 id="s2title" style="margin:12px 0 6px"></h3>
-  <label>📖 Choose subject</label>
-  <div id="subs" style="display:flex;flex-wrap:wrap;gap:9px;margin-top:10px"></div>
-  <div id="list" style="margin-top:16px"></div>
-</div>
-
-<!-- Paper Screen -->
-<div id="s3" class="card" hidden>
-  <div style="display:flex;gap:9px;margin-bottom:16px"><button id="back2" class="sec">← Back</button><button id="printBtn" class="sec">🖨️ Print</button></div>
-  <h2 id="ptitle"></h2>
-  <div id="paper"></div>
-  
-  <!-- New Paper Button -->
-  <div style="margin-top:30px;padding-top:20px;border-top:2px dashed #cbd7e8;text-align:center">
-    <p style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:10px">Finished with this paper?</p>
-    <button id="newPaperBtn" class="go" style="margin-top:0">🔄 I need a new Paper</button>
-    <p id="newPaperMsg" class="err" style="margin-top:10px"></p>
+<section id="s1" class="card">
+  <h2>🔐 Open a paper</h2>
+  <div class="row">
+    <div><label>Class</label><select id="cls"><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+    <div><label>Class code</label><input id="code" placeholder="Type class code"></div>
+    <div><label>Section</label><select id="sec"></select></div>
+    <div><label>Section code</label><input id="scode" placeholder="Type section code"></div>
   </div>
-</div>
+  <button id="openBtn" class="go">Open →</button>
+  <p id="s1msg" class="status err"></p>
+</section>
+
+<section id="s2" class="card" hidden>
+  <h2 id="s2title"></h2>
+  <div id="subs" class="row"></div>
+  <div id="list"></div>
+  <button id="back1" class="sec">← Back</button>
+</section>
+
+<section id="s3" class="card" hidden>
+  <h2 id="ptitle"></h2>
+  <p id="pinfo" class="small"></p>
+  <div id="paper"></div>
+  <button id="printBtn" class="go">🖨️ Print</button>
+  <button id="back2" class="sec">← Back</button>
+</section>
 </main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y",
-  authDomain: "mirs-ai.firebaseapp.com",
-  projectId: "mirs-ai",
-  storageBucket: "mirs-ai.firebasestorage.app",
-  messagingSenderId: "478184601355",
-  appId: "1:478184601355:web:85f99d485db2e12860940e"
-};
+const firebaseConfig = { apiKey:"AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain:"mirs-ai.firebaseapp.com", projectId:"mirs-ai", storageBucket:"mirs-ai.firebasestorage.app", messagingSenderId:"478184601355", appId:"1:478184601355:web:85f99d485db2e12860940e" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const WORKER_URL = "https://mirs-papers-ai.vgoud016964.workers.dev";
 const $ = id => document.getElementById(id);
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const nl = s => esc(s).replace(/\n/g, "<br>");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nl = s => esc(s).replace(/\n/g,"<br>");
 const SUBJECTS = ["Physics","Chemistry","Biology","Mathematics","Social"];
 const SECTIONS = ["K1","K2","K3","K4","A1","A2","A3","A4","S1","S2","S3","S4","N1","N2","N3","N4"];
 const ICON = { Physics:"⚛️", Chemistry:"🧪", Biology:"🧬", Mathematics:"📐", Social:"🌍" };
-let classNo = 0, section = "All", subject = "", papers = [], open = null;
+const AR_OPTS = { A:"Both A and R are true, and R is the correct explanation of A.", B:"Both A and R are true, but R is not the correct explanation of A.", C:"A is true, but R is false.", D:"A is false, but R is true." };
+let classNo=0, section="All", subject="", papers=[], open=null;
 
-$("sec").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(x => `<option value="${x}">${x}</option>`).join("");
+$("sec").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(x=>`<option value="${x}">${x}</option>`).join("");
 
-function show(id) { ["s1","s2","s3"].forEach(x => $(x).hidden = x !== id); window.scrollTo(0,0); }
-async function sha(s) {
-  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
-  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
-}
+async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+function show(id){ ["s1","s2","s3"].forEach(x=>$(x).hidden = x!==id); window.scrollTo(0,0); }
 
-// Ask Anything Logic
 $("askBtn").onclick = async () => {
   const q = $("askInput").value.trim();
-  if (q.length < 2) return;
-  const btn = $("askBtn"), ans = $("askAnswer");
-  btn.disabled = true; btn.textContent = "⏳ Thinking..."; ans.textContent = "Checking if this is educational...";
+  if (q.length<2) return;
+  const b=$("askBtn"), a=$("askAnswer");
+  b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
+  
+  const askTimer = setTimeout(() => {
+    if (b.textContent.includes("Thinking")) {
+      b.disabled = false; b.textContent = "Ask AI";
+      a.textContent = "The AI took too long. You may have hit the free daily limit. Please try again later.";
+    }
+  }, 15000);
+
   try {
-    const r = await fetch("https://mirs-papers-ai.vgoud016964.workers.dev", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"ask", question: q }) });
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"ask", question:q }) });
     const j = await r.json();
-    ans.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
-  } catch(e) { ans.textContent = "Could not reach AI service."; }
-  finally { btn.disabled = false; btn.textContent = "Ask AI"; }
+    clearTimeout(askTimer);
+    a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
+  } catch { 
+    clearTimeout(askTimer);
+    a.textContent = "Could not reach AI service."; 
+  }
+  finally { 
+    clearTimeout(askTimer);
+    b.disabled=false; b.textContent="Ask AI"; 
+  }
 };
 
-// Login Logic
 $("openBtn").onclick = async () => {
-  const c = +$("cls").value, v = $("code").value.trim().toLowerCase();
-  const sec = $("sec").value, sv = $("scode").value.trim().toLowerCase();
+  const c=+$("cls").value, v=$("code").value.trim().toLowerCase();
+  const sec=$("sec").value, sv=$("scode").value.trim().toLowerCase();
   $("s1msg").textContent = "";
   if (!v) return $("s1msg").textContent = "Type the class code.";
-  if (sec !== "All" && !sv) return $("s1msg").textContent = "Type the section code.";
-  
+  if (sec!=="All" && !sv) return $("s1msg").textContent = "Type the section code.";
   $("openBtn").disabled = true;
   try {
-    const s = await getDoc(doc(db, "settings", "classCodeHashes"));
+    const s = await getDoc(doc(db,"settings","classCodeHashes"));
     const want = s.exists() ? s.data()[c] : null;
-    if (want !== await sha(c+":"+v)) return $("s1msg").textContent = "Wrong class code.";
-    if (sec !== "All") {
-      const s2 = await getDoc(doc(db, "settings", "sectionCodeHashes"));
+    if (!want || want !== await sha(c+":"+v)) return $("s1msg").textContent = "Wrong class code.";
+    if (sec!=="All"){
+      const s2 = await getDoc(doc(db,"settings","sectionCodeHashes"));
       const wantS = s2.exists() ? s2.data()[sec] : null;
-      if (wantS !== await sha("section:"+sec+":"+sv)) return $("s1msg").textContent = "Wrong section code.";
+      if (!wantS || wantS !== await sha("section:"+sec+":"+sv)) return $("s1msg").textContent = "Wrong section code.";
     }
-    classNo = c; section = sec; subject = "";
-    $("s2title").textContent = `🎓 Class ${c}${sec !== "All" ? " · Section " + sec : ""}`;
-    $("subs").innerHTML = SUBJECTS.map(x => `<button class="sec" data-s="${x}">${ICON[x]} ${x}</button>`).join("");
+    classNo=c; section=sec; subject="";
+    $("s2title").textContent = `🎓 Class ${c}${sec!=="All"?" · Section "+sec:""}`;
+    $("subs").innerHTML = SUBJECTS.map(x=>`<button data-s="${x}">${ICON[x]} ${x}</button>`).join("");
     $("list").innerHTML = ""; show("s2");
-  } catch (e) { $("s1msg").textContent = "Connection error."; }
-  finally { $("openBtn").disabled = false; }
+  } catch { $("s1msg").textContent = "Connection error."; }
+  finally { $("openBtn").disabled=false; }
 };
 
 $("subs").addEventListener("click", async e => {
-  const b = e.target.closest("[data-s]"); if (!b) return;
-  subject = b.dataset.s;
-  $("list").textContent = "Loading...";
+  const b=e.target.closest("[data-s]"); if (!b) return;
+  subject=b.dataset.s;
+  $("subs").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  $("list").textContent="Loading...";
   try {
-    const snap = await getDocs(query(collection(db, "papers"), where("classNo", "==", classNo), where("subject", "==", subject)));
-    let list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (section !== "All") list = list.filter(p => !p.section || p.section === "All" || p.section === section);
-    papers = list.sort((a,b) => String(a.topic).localeCompare(String(b.topic)));
+    const snap = await getDocs(query(collection(db,"papers"), where("classNo","==",classNo), where("subject","==",subject)));
+    let list = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if (section!=="All") list = list.filter(p=>!p.section || p.section==="All" || p.section===section);
+    papers = list.sort((a,b)=>String(a.topic).localeCompare(String(b.topic)));
     $("list").innerHTML = papers.length
-      ? papers.map((p, i) => `<div style="border-bottom:1px solid #e5ebf4;padding:14px 0;display:flex;justify-content:space-between"><div><b>${esc(p.topic)}</b><br><small>${p.questions.length} Qs</small></div><button class="sec" data-p="${i}">Open →</button></div>`).join("")
-      : "<p>📭 No papers found.</p>";
-  } catch (e) { $("list").textContent = "Error loading."; }
+      ? papers.map((p,i)=>`<div class="item"><div><b>${esc(p.topic)}</b><br><span class="small">${p.mode==="practice"?"📝 Practice":"📄 Question"} · ${(p.questions||[]).length} Qs</span></div><button class="sec" data-p="${i}">Open →</button></div>`).join("")
+      : "<p class='small'>📭 No papers yet.</p>";
+  } catch { $("list").textContent="Could not load papers."; }
 });
 
 $("list").addEventListener("click", e => {
-  const b = e.target.closest("[data-p]"); if (!b) return;
-  open = papers[+b.dataset.p]; 
-  $("newPaperBtn").textContent = `🔄 I need a new ${open.mode === "practice" ? "Practice" : "Question"} Paper`;
-  renderPaper(); show("s3");
+  const b=e.target.closest("[data-p]"); if (!b) return;
+  open = papers[+b.dataset.p]; renderPaper(); show("s3");
 });
 $("back1").onclick = () => show("s1");
 $("back2").onclick = () => show("s2");
 $("printBtn").onclick = () => window.print();
 
-function renderPaper() {
-  const p = open, practice = p.mode === "practice", qs = p.questions || [];
+function renderPaper(){
+  const p=open, practice=p.mode==="practice", qs=p.questions||[];
   $("ptitle").textContent = `📘 Class ${p.classNo} · ${p.subject} · ${p.topic}`;
-  let h = qs.map((q, i) => {
-    let html = `<div class="q"><p><b>Q${i + 1}.</b> `;
-    if (q.type === "ar") {
-      html += `<b>Assertion:</b> ${nl(q.assertion)}<br><b>Reason:</b> ${nl(q.reason)}</p>`;
+  $("pinfo").textContent = practice ? "📝 Practice paper: answer after each question." : "📄 Question paper: answers at the end.";
+  let h = qs.map((q,i)=>{
+    let x = `<div class="q"><p><b>Q${i+1}.</b> `;
+    if (q.type==="ar"){
+      x += `<b>Assertion:</b> ${nl(q.assertion)}</p><p><b>Reason:</b> ${nl(q.reason)}</p>`;
+      x += ["A","B","C","D"].map(l=>`<div class="opt">(${l}) ${esc(AR_OPTS[l])}</div>`).join("");
     } else {
-      html += `${nl(q.q)}</p>`;
-      if (q.type === "mcq") html += q.options.map((o,k)=>`<div class="opt">(${"ABCD"[k]}) ${esc(o)}</div>`).join("");
+      x += `${nl(q.q)}</p>`;
+      if (q.type==="mcq") x += (q.options||[]).map((o,k)=>`<div class="opt">(${"ABCD"[k]}) ${esc(o)}</div>`).join("");
     }
-    if (practice) html += `<div class="ans">✅ Answer: ${nl(q.answer)}</div>`;
-    html += `<div class="rep"><button data-r="${i}">🚩 Report a wrong question</button></div></div>`;
-    return html;
+    if (practice) x += `<div class="ans">✅ <b>Answer (${esc(q.answer)})</b><br>${nl(q.explanation||q.answer)}</div>`;
+    x += `<div class="rep"><button data-r="${i}">🚩 Report</button></div></div>`;
+    return x;
   }).join("");
+  if (!practice){
+    h += `<h3>🔑 Answer Key</h3>` + qs.map((q,i)=>`<div class="ans" style="margin-bottom:8px"><b>Q${i+1}:</b> ${esc(q.answer)}</div>`).join("");
+  }
+  h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
 }
 
 $("paper").addEventListener("click", async e => {
-  const b = e.target.closest("[data-r]"); if (!b || !open) return;
-  const note = prompt("What is wrong with this question?");
-  if (!note) return;
-  
-  const qIdx = +b.dataset.r;
-  b.textContent = "⏳ Checking..."; b.disabled = true;
-  
-  try {
-    const vReq = await fetch("https://mirs-papers-ai.vgoud016964.workers.dev", { 
-      method:"POST", headers:{"Content-Type":"application/json"}, 
-      body: JSON.stringify({ action:"verifyReport", classNo: open.classNo, subject: open.subject, topic: open.topic, questionData: open.questions[qIdx] }) 
-    });
-    const vRes = await vReq.json();
-    
-    if (vRes.ok && !vRes.isWrong) {
-      alert("🤖 AI Check: This question is actually correct!\n\n" + vRes.reason);
-      b.textContent = "🚩 Report a wrong question"; b.disabled = false;
-    } else {
-      await addDoc(collection(db, "reports"), { 
-        paperId: open.id, title: open.topic, qNo: qIdx + 1, 
-        note: note.trim().slice(0, 300), createdAt: new Date().toISOString() 
-      });
-      b.textContent = "✅ Reported to teacher"; 
-    }
-  } catch (err) {
-    b.textContent = "❌ Failed to report"; b.disabled = false;
+  const ask = e.target.closest("#studentDoubtBtn");
+  if (ask && open){
+    const question = $("studentDoubtQuestion").value.trim();
+    const ans = $("studentDoubtAnswer");
+    if (question.length<2){ ans.textContent = "Type your doubt first."; return; }
+    ask.disabled=true; ask.textContent="⏳ Thinking..."; ans.textContent="Checking...";
+    try {
+      const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ action:"doubt", classNo:Number(open.classNo), subject:String(open.subject||""), topic:String(open.topic||""), question }) });
+      const j = await r.json();
+      ans.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
+    } catch { ans.textContent = "Could not reach AI."; }
+    finally { ask.disabled=false; ask.textContent="🤖 Ask AI"; }
+    return;
   }
-});
-
-$("newPaperBtn").onclick = async () => {
-  if (!open) return;
-  const btn = $("newPaperBtn"), msg = $("newPaperMsg");
-  btn.disabled = true; msg.textContent = "Generating fresh questions...";
+  const b = e.target.closest("[data-r]"); if (!b||!open) return;
+  const note = prompt("What is wrong with this question?"); if (!note) return;
   try {
-    const counts = { mcq:0, ar:0, short:0, long:0 };
-    open.questions.forEach(q => counts[q.type]++);
-    const r = await fetch("https://mirs-papers-ai.vgoud016964.workers.dev", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ idToken: "STUDENT_NEW", classNo: open.classNo, subject: open.subject, topic: open.topic, counts })
-    });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
-    open.questions = j.questions;
-    renderPaper(); msg.textContent = "✅ New paper generated!";
-  } catch (e) { msg.textContent = "Failed to generate. Try again."; }
-  finally { btn.disabled = false; }
-};
+    await addDoc(collection(db,"reports"), { paperId:open.id, title:open.title||open.topic, qNo:+b.dataset.r+1, note:note.trim().slice(0,300), createdAt:new Date().toISOString() });
+    b.textContent="✅ Reported"; b.disabled=true;
+  } catch { alert("Could not send report."); }
+});
 </script>
 </body>
 </html>
