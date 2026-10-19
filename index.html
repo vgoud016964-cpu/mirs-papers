@@ -169,7 +169,18 @@ $("list").addEventListener("click", e => {
 $("back1").onclick = () => show("s1");
 $("back2").onclick = () => show("s2");
 $("printBtn").onclick = () => window.print();
-
+$("paper").addEventListener("click", e => {
+  if (e.target.id === "toggleKeyBtn") {
+    const sec = document.getElementById("answerKeySection");
+    if (sec.style.display === "none") {
+      sec.style.display = "block";
+      e.target.textContent = "🙈 Hide Answer Key";
+    } else {
+      sec.style.display = "none";
+      e.target.textContent = "🔑 Show Answer Key";
+    }
+  }
+});
 function renderPaper(){
   const p=open, practice=p.mode==="practice", qs=p.questions||[];
   $("ptitle").textContent = `📘 Class ${p.classNo} · ${p.subject} · ${p.topic}`;
@@ -193,9 +204,12 @@ function renderPaper(){
   }).join("");
   
   // Show the Answer Key at the end ONLY if it is a Question paper
-  if (!practice){
-    h += `<h3>🔑 Answer Key</h3>` + qs.map((q,i)=>{
-      // For MCQ, add the correct option text if it exists
+    if (!practice){
+    h += `<div class="noprint" style="margin-top:20px; text-align:center;">
+            <button id="toggleKeyBtn" class="go" style="background:linear-gradient(115deg,#16a34a,#22c55e);">🔑 Show Answer Key</button>
+          </div>
+          <div id="answerKeySection" style="display:none; margin-top:15px;">
+            <h3>🔑 Answer Key</h3>` + qs.map((q,i)=>{
       let answerText = esc(q.answer);
       if (q.type === "mcq" && q.options) {
          let correctIndex = {"A":0,"B":1,"C":2,"D":3}[q.answer];
@@ -208,7 +222,7 @@ function renderPaper(){
         <b>Q${i+1}:</b> ${answerText} <br>
         <span style="font-size: 13px; color: #555;">💡 <b>Explanation:</b> ${nl(q.explanation || "Refer to textbook.")}</span>
       </div>`;
-    }).join("");
+    }).join("") + `</div>`;
   }
   h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
