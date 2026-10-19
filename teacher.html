@@ -81,8 +81,11 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
   <div class="card">
     <div class="row">
       <div><label>🎓 Class</label><select id="gClass"></select></div>
+      <div><label>🏫 Section</label><select id="gSection"></select></div>
       <div><label>📖 Subject</label><select id="gSub"></select></div>
-      <div><label>🧾 Paper type</label><select id="gMode"><option value="practice">📝 Practice paper (answer after each question)</option><option value="question">📄 Question paper (answers at the end)</option></select></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label>🧾 Paper type</label><select id="gMode"><option value="practice">📝 Practice paper</option><option value="question">📄 Question paper</option></select></div>
     </div>
     <label>🏷️ Topic name</label>
     <input id="gTopic" placeholder="Example: Living Organisms" maxlength="120">
@@ -145,11 +148,13 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const SUBJECTS = ["Physics","Chemistry","Biology","Mathematics","Social"];
 const CLASSES = [6,7,8,9,10];
+const SECTIONS = ["All","K1","K2","K3","K4","A1","A2","A3","A4","S1","S2","S3","S4","N1","N2","N3","N4"];
 const TYPE_NAME = { mcq:"🔘 MCQ", ar:"🔗 Assertion-Reason", short:"✏️ Short answer", long:"📝 Long answer" };
 const ICON = { Physics:"⚛️", Chemistry:"🧪", Biology:"🧬", Mathematics:"📐", Social:"🌍" };
 let cur = null;
 
 $("gClass").innerHTML = CLASSES.map(c => `<option value="${c}">Class ${c}</option>`).join("");
+$("gSection").innerHTML = SECTIONS.map(s => `<option value="${s}">${s}</option>`).join("");
 $("gSub").innerHTML = SUBJECTS.map(s => `<option value="${s}">${ICON[s]} ${s}</option>`).join("");
 
 $("togglePw").onclick = () => {
@@ -210,7 +215,7 @@ $("teacherAskBtn").onclick = async () => {
 };
 
 $("genBtn").onclick = async () => {
-  const classNo = +$("gClass").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
+  const classNo = +$("gClass").value, section = $("gSection").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
   const counts = { mcq:+$("cMcq").value||0, ar:+$("cAr").value||0, short:+$("cShort").value||0, long:+$("cLong").value||0 };
   const total = counts.mcq + counts.ar + counts.short + counts.long;
   if (topic.length < 2) return setStatus("genStatus", "Type the topic.", "err");
@@ -223,7 +228,7 @@ $("genBtn").onclick = async () => {
       body: JSON.stringify({ idToken, classNo, subject, topic, counts }) });
     const j = await r.json();
     if (!j.ok) { setStatus("genStatus", j.error || "Could not make the paper.", "err"); return; }
-    cur = { id:null, classNo, subject, topic, mode:$("gMode").value, questions:j.questions };
+    cur = { id:null, classNo, section, subject, topic, mode:$("gMode").value, questions:j.questions };
     renderEditor(j.warnings || [], [], j.writer, "");
     setStatus("genStatus", "Paper ready. Review and save.", "ok");
     $("editor").scrollIntoView({ behavior:"smooth" });
@@ -250,7 +255,7 @@ function card(q,i){
 function renderEditor(warnings, changes, writer, checker){
   if (!cur) { $("editor").hidden = true; return; }
   $("editor").hidden = false;
-  $("edTitle").textContent = `Class ${cur.classNo} · ${cur.subject} · ${cur.topic} · ${cur.mode==="practice"?"Practice paper":"Question paper"}`;
+  $("edTitle").textContent = `Class ${cur.classNo} · Section ${cur.section} · ${cur.subject} · ${cur.topic} · ${cur.mode==="practice"?"Practice paper":"Question paper"}`;
   let n = "";
   (warnings||[]).forEach(w=> n += `<div class="warn">⚠️ ${esc(w)}</div>`);
   if (writer) n += `<p class="small">🤖 Written by ${esc(writer)}.</p>`;
@@ -291,8 +296,8 @@ $("saveBtn").onclick = async () => {
   if (!cur || !cur.questions.length) return setStatus("saveStatus","No questions.","err");
   $("saveBtn").disabled = true;
   try {
-    const data = { classNo:cur.classNo, subject:cur.subject, topic:cur.topic, mode:cur.mode, questions:cur.questions,
-      title:`Class ${cur.classNo} ${cur.subject} - ${cur.topic}`, createdBy:auth.currentUser.email, updatedAt:serverTimestamp() };
+    const data = { classNo:cur.classNo, section:cur.section, subject:cur.subject, topic:cur.topic, mode:cur.mode, questions:cur.questions,
+      title:`Class ${cur.classNo} ${cur.section !== "All" ? "Sec " + cur.section : ""} ${cur.subject} - ${cur.topic}`, createdBy:auth.currentUser.email, updatedAt:serverTimestamp() };
     if (cur.id) await setDoc(doc(db,"papers",cur.id), data);
     else { data.createdAt = serverTimestamp(); const r = await addDoc(collection(db,"papers"), data); cur.id = r.id; }
     setStatus("saveStatus","Saved.","ok");
@@ -314,7 +319,7 @@ async function openPaper(id){
   const s = await getDoc(doc(db,"papers",id));
   if (!s.exists()) return alert("Deleted.");
   const p = s.data();
-  cur = { id, classNo:p.classNo, subject:p.subject, topic:p.topic, mode:p.mode, questions:p.questions||[] };
+  cur = { id, classNo:p.classNo, section:p.section || "All", subject:p.subject, topic:p.topic, mode:p.mode, questions:p.questions||[] };
   document.querySelector('nav button[data-tab="gen"]').click();
   renderEditor([], [], "", "");
   $("editor").scrollIntoView({behavior:"smooth"});
@@ -350,10 +355,8 @@ async function loadCodes(){
     const s2 = await getDoc(doc(db,"private","sectionCodes")); if (s2.exists()) savedSec = s2.data(); 
   } catch(e){}
   
-  const SECTIONS = ["K1","K2","K3","K4","A1","A2","A3","A4","S1","S2","S3","S4","N1","N2","N3","N4"];
-  
   $("codeBox").innerHTML = `<h4>Class Codes</h4>` + CLASSES.map(c=>`<label>Class ${c}</label><input data-c="${c}" value="${esc(savedClass[c]||"")}">`).join("");
-  $("sectionBox").innerHTML = `<h4>Section Codes</h4>` + SECTIONS.map(s=>`<label>Section ${s}</label><input data-s="${s}" value="${esc(savedSec[s]||"")}">`).join("");
+  $("sectionBox").innerHTML = `<h4>Section Codes</h4>` + SECTIONS.filter(s => s !== "All").map(s=>`<label>Section ${s}</label><input data-s="${s}" value="${esc(savedSec[s]||"")}">`).join("");
 }
 
 $("codeSave").onclick = async () => {
