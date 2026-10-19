@@ -189,27 +189,16 @@ $("teacherAskBtn").onclick = async () => {
   const q = $("teacherAskInput").value.trim();
   if (q.length < 2) return;
   const b = $("teacherAskBtn"), a = $("teacherAskAnswer");
-  b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Checking...";
-  
-  const askTimer = setTimeout(() => {
-    if (b.textContent.includes("Thinking")) {
-      b.disabled = false; b.textContent = "🤖 Ask AI";
-      a.textContent = "The AI took too long. You may have hit the free daily limit.";
-    }
-  }, 15000);
-
+  b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Asking AI (this can take up to 30 seconds)...";
   try {
     const idToken = await auth.currentUser.getIdToken();
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, 
       body: JSON.stringify({ action:"ask", question:q, idToken }) });
     const j = await r.json();
-    clearTimeout(askTimer);
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch { 
-    clearTimeout(askTimer);
-    a.textContent = "Could not reach AI service."; 
+    a.textContent = "Could not reach AI service. Check your internet.";
   } finally { 
-    clearTimeout(askTimer);
     b.disabled = false; b.textContent = "🤖 Ask AI"; 
   }
 };
