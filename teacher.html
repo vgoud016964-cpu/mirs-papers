@@ -97,6 +97,14 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
     <p id="genStatus" class="status"></p>
   </div>
 
+  <div class="card">
+    <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
+    <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
+    <textarea id="teacherAskInput" placeholder="Type your question here..."></textarea>
+    <button id="teacherAskBtn" class="go">🤖 Ask AI</button>
+    <div id="teacherAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
+  </div>
+
   <div id="editor" class="card" hidden>
     <h3 id="edTitle" style="margin-top:0"></h3>
     <div id="notes"></div>
@@ -112,8 +120,11 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
 <section id="tab-saved"><div class="card"><h3>🗂️ Saved papers</h3><div id="savedList">Loading...</div></div></section>
 <section id="tab-rep"><div class="card"><h3>🚩 Reports</h3><div id="repList">Loading...</div></div></section>
 <section id="tab-codes"><div class="card">
-  <h3>🔑 Class codes</h3>
-  <div id="codeBox"></div>
+  <h3>🔑 Class & Section codes</h3>
+  <div class="row">
+    <div id="codeBox"></div>
+    <div id="sectionBox"></div>
+  </div>
   <button id="codeSave" class="go">💾 Save codes</button>
   <p id="codeStatus" class="status"></p>
 </div></section>
@@ -168,6 +179,35 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 });
 
 function setStatus(id, t, cls) { const e = $(id); e.textContent = t; e.className = "status " + (cls || ""); }
+
+$("teacherAskBtn").onclick = async () => {
+  const q = $("teacherAskInput").value.trim();
+  if (q.length < 2) return;
+  const b = $("teacherAskBtn"), a = $("teacherAskAnswer");
+  b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Checking...";
+  
+  const askTimer = setTimeout(() => {
+    if (b.textContent.includes("Thinking")) {
+      b.disabled = false; b.textContent = "🤖 Ask AI";
+      a.textContent = "The AI took too long. You may have hit the free daily limit.";
+    }
+  }, 15000);
+
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, 
+      body: JSON.stringify({ action:"ask", question:q, idToken }) });
+    const j = await r.json();
+    clearTimeout(askTimer);
+    a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
+  } catch { 
+    clearTimeout(askTimer);
+    a.textContent = "Could not reach AI service."; 
+  } finally { 
+    clearTimeout(askTimer);
+    b.disabled = false; b.textContent = "🤖 Ask AI"; 
+  }
+};
 
 $("genBtn").onclick = async () => {
   const classNo = +$("gClass").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
@@ -304,21 +344,40 @@ $("repList").addEventListener("click", async e => {
 
 async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 async function loadCodes(){
-  let saved = {};
-  try { const s = await getDoc(doc(db,"private","classCodes")); if (s.exists()) saved = s.data(); } catch(e){}
-  $("codeBox").innerHTML = CLASSES.map(c=>`<label>Class ${c}</label><input data-c="${c}" value="${esc(saved[c]||"")}">`).join("");
+  let savedClass = {}, savedSec = {};
+  try { 
+    const s1 = await getDoc(doc(db,"private","classCodes")); if (s1.exists()) savedClass = s1.data(); 
+    const s2 = await getDoc(doc(db,"private","sectionCodes")); if (s2.exists()) savedSec = s2.data(); 
+  } catch(e){}
+  
+  const SECTIONS = ["K1","K2","K3","K4","A1","A2","A3","A4","S1","S2","S3","S4","N1","N2","N3","N4"];
+  
+  $("codeBox").innerHTML = `<h4>Class Codes</h4>` + CLASSES.map(c=>`<label>Class ${c}</label><input data-c="${c}" value="${esc(savedClass[c]||"")}">`).join("");
+  $("sectionBox").innerHTML = `<h4>Section Codes</h4>` + SECTIONS.map(s=>`<label>Section ${s}</label><input data-s="${s}" value="${esc(savedSec[s]||"")}">`).join("");
 }
+
 $("codeSave").onclick = async () => {
-  const plain = {}, hashes = {};
+  const plainClass = {}, hashesClass = {};
+  const plainSec = {}, hashesSec = {};
+
   for (const inp of $("codeBox").querySelectorAll("input")) {
     const c = inp.dataset.c, v = inp.value.trim();
     if (v.length < 4) return setStatus("codeStatus", `Class ${c} code needs 4+ chars.`, "err");
-    plain[c] = v; hashes[c] = await sha(c + ":" + v.toLowerCase());
+    plainClass[c] = v; hashesClass[c] = await sha(c + ":" + v.toLowerCase());
   }
+
+  for (const inp of $("sectionBox").querySelectorAll("input")) {
+    const s = inp.dataset.s, v = inp.value.trim();
+    if (v.length < 4) return setStatus("codeStatus", `Section ${s} code needs 4+ chars.`, "err");
+    plainSec[s] = v; hashesSec[s] = await sha("section:" + s + ":" + v.toLowerCase());
+  }
+
   try {
-    await setDoc(doc(db,"private","classCodes"), plain);
-    await setDoc(doc(db,"settings","classCodeHashes"), hashes);
-    setStatus("codeStatus", "Saved.", "ok");
+    await setDoc(doc(db,"private","classCodes"), plainClass);
+    await setDoc(doc(db,"settings","classCodeHashes"), hashesClass);
+    await setDoc(doc(db,"private","sectionCodes"), plainSec);
+    await setDoc(doc(db,"settings","sectionCodeHashes"), hashesSec);
+    setStatus("codeStatus", "All codes saved.", "ok");
   } catch(e){ setStatus("codeStatus", "Save failed: " + e.message, "err"); }
 };
 </script>
