@@ -7,129 +7,112 @@
 <title>MIRS Practice Papers - Teacher</title>
 <style>
 *{box-sizing:border-box}
-:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--primary-dark:#342e9f;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--soft:#f0efff;--shadow:0 10px 30px rgba(38,39,94,.08)}
+:root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--primary-dark:#342e9f;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--soft:#f0efff;--shadow:0 10px 30px rgba(38,39,94,.08)}
 body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:linear-gradient(115deg,#25245d 0%,#4b43c7 64%,#167e99 100%);color:#fff;padding:19px max(18px,calc((100% - 1060px)/2));box-shadow:0 8px 24px rgba(43,42,121,.18)}
 header h1{font-size:clamp(18px,2.5vw,24px);margin:0;font-weight:760;letter-spacing:-.4px}
 header span{font-size:13px;opacity:.92}
-nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px max(18px,calc((100% - 1060px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid #e2e7f2;position:sticky;top:0;z-index:10}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px max(18px,calc((100% - 1060px)/2));background:rgba(255,255,255,.94);border-bottom:1px solid #e2e7f2;box-shadow:0 4px 14px rgba(25,36,75,.035);position:sticky;top:0;z-index:10}
 nav button{background:#f2f2ff;color:#45409f;border:1px solid transparent;padding:10px 15px;border-radius:10px;font-weight:700;cursor:pointer}
 nav button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;box-shadow:0 4px 10px rgba(75,67,199,.2)}
 main{max-width:1020px;margin:26px auto;padding:0 18px 42px}
-section{display:none} section.on{display:block}
+section{display:none}
+section.on{display:block}
 .card{background:var(--surface);border:1px solid rgba(216,222,241,.95);border-radius:17px;padding:clamp(17px,2.7vw,24px);margin-bottom:17px;box-shadow:var(--shadow)}
 label{display:block;font-size:13px;font-weight:750;color:#384562;margin:13px 0 6px}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
 textarea{resize:vertical;min-height:76px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px}
-button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px}
+button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
+button.go:disabled{opacity:.55;cursor:wait}
 button.sec{background:#fff;color:#4b43c7;border:1px solid #cbc9f5;padding:8px 13px;border-radius:9px;cursor:pointer;font-weight:700}
-button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 11px;border-radius:9px;cursor:pointer}
+button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px 11px;border-radius:9px;cursor:pointer;font-weight:650}
 .status{margin-top:12px;font-weight:650}
 .err{color:#b42335}
-.ok{color:#13734d}
+.status.ok:not(:empty)::before{content:"\2705  "}
+.status.err:not(:empty)::before{content:"\26A0\FE0F  "}
 .warn{background:#fff7e9;border:1px solid #f6d19a;border-radius:11px;padding:12px 14px;margin:12px 0;font-size:14px}
 .q{border:1px solid #dfe2f2;border-radius:13px;padding:15px;margin:13px 0;background:linear-gradient(145deg,#fff,#fafaff)}
 .q h4{margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .small{font-size:13px;color:var(--muted)}
-.overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(22,32,76,.96),rgba(62,49,145,.94),rgba(15,111,133,.91));display:flex;align-items:center;justify-content:center;z-index:50}
-.box{background:#fff;padding:34px;border-radius:20px;width:390px;max-width:100%}
+.overlay{position:fixed;inset:0;background:linear-gradient(135deg,rgba(22,32,76,.96),rgba(62,49,145,.94),rgba(15,111,133,.91));display:flex;align-items:center;justify-content:center;z-index:50;padding:18px}
+.box{background:#fff;padding:clamp(24px,4vw,34px);border:1px solid rgba(255,255,255,.45);box-shadow:0 24px 70px rgba(7,13,42,.28);border-radius:20px;width:390px;max-width:100%}
+.box h2{color:#202453;font-size:25px;letter-spacing:-.5px}
 .box input{margin-bottom:10px}
 .item{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid #e8ebf4}
 [hidden]{display:none!important}
-
-/* IMAGE PATH UPDATED TO .jpg */
 .t-ill{background:#fff url("teacher.jpg") center/contain no-repeat;flex:none;width:150px;height:94px;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.75)}
 .t-ill-lg{width:100%;height:170px;margin:4px 0 12px;box-shadow:none;border:0;border-radius:0}
 .brand{display:flex;align-items:center;gap:16px}
 .brand .sub{font-size:13px;opacity:.92;margin-top:2px}
+.fl{display:block;font-size:13px;font-weight:800;margin:4px 0 6px;letter-spacing:.2px}
+.fl-e{color:#db2777}.fl-p{color:#6d28d9}
+.field{display:flex;align-items:stretch;border:2px solid var(--fc);border-radius:14px;background:#fff;overflow:hidden;margin-bottom:14px}
+.field.fe{--fc:#ec4899;--fg:linear-gradient(135deg,#f472b6,#fb923c)}
+.field.fp{--fc:#7c3aed;--fg:linear-gradient(135deg,#8b5cf6,#3b82f6)}
+.field .fi{flex:none;width:52px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--fg)}
+.box .field input{flex:1;min-width:0;border:0;box-shadow:none;margin:0;background:transparent;padding:13px 12px;border-radius:0;font-size:15px}
+.box .field button{flex:none;border:0;border-left:1px solid #ede9fe;background:#f5f3ff;color:#6d28d9;padding:0 14px;margin:0;font-weight:700;border-radius:0;cursor:pointer}
 </style>
 </head>
 <body>
 <div id="login" class="overlay"><div class="box">
-  <div class="t-ill t-ill-lg" role="img" aria-label="Teacher at a computer"></div>
+  <div class="t-ill t-ill-lg"></div>
   <h2 style="margin:0 0 14px">🔐 Teacher Login</h2>
-  <label>Email address</label>
-  <input id="em" type="email" placeholder="Type your email" autocomplete="username">
-  <label>Password</label>
-  <input id="pw" type="password" placeholder="Type your password" autocomplete="current-password">
+  <label class="fl fl-e">Email address</label>
+  <div class="field fe"><span class="fi">✉️</span><input id="em" type="email" placeholder="Type your email"></div>
+  <label class="fl fl-p">Password</label>
+  <div class="field fp"><span class="fi">🔒</span><input id="pw" type="password" placeholder="Type your password"><button id="togglePw" type="button">👁️ Show</button></div>
   <button id="loginBtn" class="go" style="width:100%;margin:0">🔓 Sign in</button>
   <p id="loginMsg" class="err"></p>
 </div></div>
 
 <div id="app" hidden>
-<header>
-  <div class="brand">
-    <div class="t-ill" role="img" aria-label="Teacher at a computer"></div>
-    <div><h1>MIRS Practice Papers · Teacher</h1><div class="sub">CBSE · Classes 6 to 10</div></div>
-  </div>
-  <span id="who"></span><button id="outBtn" class="sec">🚪 Sign out</button>
-</header>
-
+<header><div class="brand"><div class="t-ill"></div><div><h1>MIRS Practice Papers · Teacher</h1><div class="sub">CBSE · Classes 6 to 10</div></div></div><span id="who"></span><button id="outBtn" class="sec">🚪 Sign out</button></header>
 <nav>
   <button data-tab="gen" class="on">✨ Make paper</button>
   <button data-tab="saved">🗂️ Saved papers</button>
   <button data-tab="rep">🚩 Reports <span id="repN"></span></button>
   <button data-tab="codes">🔑 Class codes</button>
 </nav>
-
 <main>
+
 <section id="tab-gen" class="on">
   <div class="card">
     <div class="row">
       <div><label>🎓 Class</label><select id="gClass"></select></div>
-      <div><label>🏫 Section</label><select id="gSection"></select></div>
       <div><label>📖 Subject</label><select id="gSub"></select></div>
-      <div><label>🧾 Type</label><select id="gMode"><option value="practice">📝 Practice paper</option><option value="question">📄 Question paper</option></select></div>
+      <div><label>🧾 Paper type</label><select id="gMode"><option value="practice">📝 Practice paper (answer after each question)</option><option value="question">📄 Question paper (answers at the end)</option></select></div>
     </div>
-    <label>🏷️ Topic</label>
-    <input id="gTopic" placeholder="Type the topic name here" maxlength="120">
+    <label>🏷️ Topic name</label>
+    <input id="gTopic" placeholder="Example: Living Organisms" maxlength="120">
     <div class="row">
       <div><label>🔘 MCQ</label><input id="cMcq" type="number" min="0" max="30" value="5"></div>
       <div><label>🔗 Assertion-Reason</label><input id="cAr" type="number" min="0" max="30" value="2"></div>
-      <div><label>✏️ Short</label><input id="cShort" type="number" min="0" max="30" value="3"></div>
-      <div><label>📝 Long</label><input id="cLong" type="number" min="0" max="30" value="2"></div>
+      <div><label>✏️ Short answer</label><input id="cShort" type="number" min="0" max="30" value="3"></div>
+      <div><label>📝 Long answer</label><input id="cLong" type="number" min="0" max="30" value="2"></div>
     </div>
-    <p class="small">💡 The AI writes the paper. This can take 10-20 seconds.</p>
+    <p class="small">💡 Total questions: maximum 30. The AI writes the paper.</p>
     <button id="genBtn" class="go">⚡ Generate paper</button>
     <p id="genStatus" class="status"></p>
   </div>
-<script>
-  let askTimer = null;
-  document.getElementById("teacherAskBtn").addEventListener("click", () => {
-    clearTimeout(askTimer);
-    askTimer = setTimeout(() => {
-      const btn = document.getElementById("teacherAskBtn");
-      if (btn.textContent.includes("Thinking")) {
-        btn.disabled = false;
-        btn.textContent = "🤖 Ask AI";
-        document.getElementById("teacherAskAnswer").textContent = "The AI took too long. You may have hit the free daily limit. Please try again tomorrow.";
-      }
-    }, 15000);
-  });
-</script>
-  <div class="card">
-    <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
-    <p class="small">Need help with a concept, formula, or fact? Ask here (School topics only).</p>
-    <textarea id="teacherAskInput" placeholder="Type your question here..."></textarea>
-    
-   <div id="teacherAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;min-height: 100px; overflow-y: auto;
+
   <div id="editor" class="card" hidden>
     <h3 id="edTitle" style="margin-top:0"></h3>
     <div id="notes"></div>
-    <p class="small">👀 Please read every question. You can edit or delete.</p>
+    <div class="doubt-card"><h3>💬 Ask a doubt about this paper's topic</h3><p id="teacherDoubtTopic" class="small">Ask about the topic of the paper being created.</p><textarea id="teacherDoubtQuestion" maxlength="500" placeholder="Ask for meaning, explanation, examples, or related information..."></textarea><button id="teacherDoubtBtn" class="go">🤖 Ask AI</button><div id="teacherDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>
+    <p class="small">👀 <b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
     <div id="qs"></div>
-    <button id="saveBtn" class="go">💾 Save paper</button>
-    <button id="cancelBtn" class="sec">✖️ Close</button>
+    <button id="saveBtn" class="go">💾 Save paper for students</button>
+    <button id="cancelBtn" class="sec">✖️ Close without saving</button>
     <p id="saveStatus" class="status"></p>
   </div>
 </section>
 
 <section id="tab-saved"><div class="card"><h3>🗂️ Saved papers</h3><div id="savedList">Loading...</div></div></section>
-<section id="tab-rep"><div class="card"><h3>🚩 Reports from students</h3><div id="repList">Loading...</div></div></section>
+<section id="tab-rep"><div class="card"><h3>🚩 Reports</h3><div id="repList">Loading...</div></div></section>
 <section id="tab-codes"><div class="card">
-  <h3>🔑 Class & Section codes</h3>
-  <p class="small">Give each class its code. Students need it to open papers.</p>
+  <h3>🔑 Class codes</h3>
   <div id="codeBox"></div>
   <button id="codeSave" class="go">💾 Save codes</button>
   <p id="codeStatus" class="status"></p>
@@ -143,41 +126,30 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 import { getFirestore, collection, addDoc, setDoc, doc, getDoc, getDocs, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const WORKER_URL = "https://mirs-papers-ai.vgoud016964.workers.dev";
-const firebaseConfig = { apiKey: "AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain: "mirs-ai.firebaseapp.com", projectId: "mirs-ai", storageBucket: "mirs-ai.firebasestorage.app", messagingSenderId: "478184601355", appId: "1:478184601355:web:85f99d485db2e12860940e" };
+const firebaseConfig = { apiKey:"AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain:"mirs-ai.firebaseapp.com", projectId:"mirs-ai", storageBucket:"mirs-ai.firebasestorage.app", messagingSenderId:"478184601355", appId:"1:478184601355:web:85f99d485db2e12860940e" };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const $ = id => document.getElementById(id);
-const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const SUBJECTS = ["Physics","Chemistry","Biology","Mathematics","Social"];
 const CLASSES = [6,7,8,9,10];
 const TYPE_NAME = { mcq:"🔘 MCQ", ar:"🔗 Assertion-Reason", short:"✏️ Short answer", long:"📝 Long answer" };
 const ICON = { Physics:"⚛️", Chemistry:"🧪", Biology:"🧬", Mathematics:"📐", Social:"🌍" };
-const SECTIONS = ["K1","K2","K3","K4","A1","A2","A3","A4","S1","S2","S3","S4","N1","N2","N3","N4"];
 let cur = null;
-
-async function askAI(url, payload, onWait) {
-  let last = null;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const j = await r.json();
-      if (j && (j.ok || !(j.busy || r.status >= 500))) return j;
-      last = j;
-    } catch (e) { last = { ok: false, error: "Could not reach AI." }; }
-    if (attempt < 3) { if (onWait) onWait(attempt + 1); await new Promise(res => setTimeout(res, 3000)); }
-  }
-  return last || { ok: false, error: "AI failed." };
-}
 
 $("gClass").innerHTML = CLASSES.map(c => `<option value="${c}">Class ${c}</option>`).join("");
 $("gSub").innerHTML = SUBJECTS.map(s => `<option value="${s}">${ICON[s]} ${s}</option>`).join("");
-if ($("gSection")) { $("gSection").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(x => `<option value="${x}">${x}</option>`).join(""); }
 
+$("togglePw").onclick = () => {
+  const showing = $("pw").type === "password";
+  $("pw").type = showing ? "text" : "password";
+  $("togglePw").textContent = showing ? "🙈 Hide" : "👁️ Show";
+};
 $("loginBtn").onclick = async () => {
   $("loginMsg").textContent = "";
   try { await signInWithEmailAndPassword(auth, $("em").value.trim(), $("pw").value); }
-  catch (e) { $("loginMsg").textContent = "Login failed."; }
+  catch (e) { $("loginMsg").textContent = "Login failed. Check email and password."; }
 };
 $("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("loginBtn").click(); });
 $("outBtn").onclick = () => signOut(auth);
@@ -197,22 +169,9 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 
 function setStatus(id, t, cls) { const e = $(id); e.textContent = t; e.className = "status " + (cls || ""); }
 
-$("teacherAskBtn").onclick = async () => {
-  const q = $("teacherAskInput").value.trim();
-  if (q.length < 2) return;
-  const btn = $("teacherAskBtn"), ans = $("teacherAskAnswer");
-  btn.disabled = true; btn.textContent = "⏳ Thinking..."; ans.textContent = "Checking if educational...";
-  try {
-    const r = await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "ask", question: q }) });
-    const j = await r.json();
-    ans.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
-  } catch(e) { ans.textContent = "Could not reach AI."; }
-  finally { btn.disabled = false; btn.textContent = "Ask AI"; }
-};
-
 $("genBtn").onclick = async () => {
-  const classNo = +$("gClass").value, section = $("gSection").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
-  const counts = { mcq: +$("cMcq").value || 0, ar: +$("cAr").value || 0, short: +$("cShort").value || 0, long: +$("cLong").value || 0 };
+  const classNo = +$("gClass").value, subject = $("gSub").value, topic = $("gTopic").value.trim();
+  const counts = { mcq:+$("cMcq").value||0, ar:+$("cAr").value||0, short:+$("cShort").value||0, long:+$("cLong").value||0 };
   const total = counts.mcq + counts.ar + counts.short + counts.long;
   if (topic.length < 2) return setStatus("genStatus", "Type the topic.", "err");
   if (total < 1 || total > 30) return setStatus("genStatus", "Total questions must be 1 to 30.", "err");
@@ -220,123 +179,148 @@ $("genBtn").onclick = async () => {
   setStatus("genStatus", "Writing the paper...");
   try {
     const idToken = await auth.currentUser.getIdToken();
-    const j = await askAI(WORKER_URL, { idToken, classNo, section, subject, topic, counts }, n => setStatus("genStatus", `Trying again (${n})...`));
-    if (!j.ok) { setStatus("genStatus", j.error || "Failed.", "err"); return; }
-    cur = { id: null, classNo, section, subject, topic, mode: $("gMode").value, questions: j.questions };
-    renderEditor([], [], j.writer, "");
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ idToken, classNo, subject, topic, counts }) });
+    const j = await r.json();
+    if (!j.ok) { setStatus("genStatus", j.error || "Could not make the paper.", "err"); return; }
+    cur = { id:null, classNo, subject, topic, mode:$("gMode").value, questions:j.questions };
+    renderEditor(j.warnings || [], [], j.writer, "");
     setStatus("genStatus", "Paper ready. Review and save.", "ok");
-    $("editor").scrollIntoView({ behavior: "smooth" });
+    $("editor").scrollIntoView({ behavior:"smooth" });
   } catch (e) { setStatus("genStatus", "Could not reach AI.", "err"); }
   finally { $("genBtn").disabled = false; }
 };
 
-function ta(i, f, v, rows) { return `<textarea data-i="${i}" data-f="${f}" rows="${rows || 2}">${esc(v)}</textarea>`; }
-function letters(i, v) { return `<select data-i="${i}" data-f="answer">${["A","B","C","D"].map(l => `<option ${l === v ? "selected" : ""}>${l}</option>`).join("")}</select>`; }
-function card(q, i) {
-  let h = `<div class="q"><h4><span>Q${i + 1} · ${TYPE_NAME[q.type]}</span><button class="del" data-del="${i}">🗑️ Delete</button></h4>`;
-  if (q.type === "mcq") {
-    h += `<label>Question</label>${ta(i, "q", q.q)}`;
-    (q.options || []).forEach((o, k) => { h += `<label>Option ${"ABCD"[k]}</label><input data-i="${i}" data-o="${k}" value="${esc(o)}">`; });
-    h += `<label>Answer</label>${letters(i, q.answer)}`;
-  } else if (q.type === "ar") {
-    h += `<label>Assertion</label>${ta(i, "assertion", q.assertion)}<label>Reason</label>${ta(i, "reason", q.reason)}`;
-    h += `<label>Answer</label>${letters(i, q.answer)}`;
+function ta(i,f,v,rows){ return `<textarea data-i="${i}" data-f="${f}" rows="${rows||2}">${esc(v)}</textarea>`; }
+function letters(i,v){ return `<select data-i="${i}" data-f="answer">${["A","B","C","D"].map(l=>`<option ${l===v?"selected":""}>${l}</option>`).join("")}</select>`; }
+function card(q,i){
+  let h = `<div class="q"><h4><span>Q${i+1} · ${TYPE_NAME[q.type]}</span><button class="del" data-del="${i}">🗑️ Delete</button></h4>`;
+  if (q.type==="mcq") {
+    h += `<label>Question</label>${ta(i,"q",q.q)}`;
+    (q.options||[]).forEach((o,k)=>{ h += `<label>Option ${"ABCD"[k]}</label><input data-i="${i}" data-o="${k}" value="${esc(o)}">`; });
+    h += `<label>Answer</label>${letters(i,q.answer)}<label>Explanation</label>${ta(i,"explanation",q.explanation)}`;
+  } else if (q.type==="ar") {
+    h += `<label>Assertion</label>${ta(i,"assertion",q.assertion)}<label>Reason</label>${ta(i,"reason",q.reason)}`;
+    h += `<label>Answer</label>${letters(i,q.answer)}<label>Explanation</label>${ta(i,"explanation",q.explanation)}`;
   } else {
-    h += `<label>Question</label>${ta(i, "q", q.q)}<label>Answer</label>${ta(i, "answer", q.answer, q.type === "long" ? 6 : 3)}`;
+    h += `<label>Question</label>${ta(i,"q",q.q)}<label>Answer</label>${ta(i,"answer",q.answer, q.type==="long"?6:3)}`;
   }
   return h + "</div>";
 }
-function renderEditor(warnings, changes, writer, checker) {
+function renderEditor(warnings, changes, writer, checker){
   if (!cur) { $("editor").hidden = true; return; }
   $("editor").hidden = false;
-  $("edTitle").textContent = `Class ${cur.classNo} · ${cur.section} · ${cur.subject} · ${cur.topic}`;
+  $("edTitle").textContent = `Class ${cur.classNo} · ${cur.subject} · ${cur.topic} · ${cur.mode==="practice"?"Practice paper":"Question paper"}`;
   let n = "";
-  (warnings || []).forEach(w => n += `<div class="warn">⚠️ ${esc(w)}</div>`);
+  (warnings||[]).forEach(w=> n += `<div class="warn">⚠️ ${esc(w)}</div>`);
+  if (writer) n += `<p class="small">🤖 Written by ${esc(writer)}.</p>`;
   $("notes").innerHTML = n;
+  $("teacherDoubtTopic").textContent = `Current topic: Class ${cur.classNo} · ${cur.subject} · ${cur.topic}.`;
+  $("teacherDoubtQuestion").value = "";
+  $("teacherDoubtAnswer").textContent = "";
   $("qs").innerHTML = cur.questions.map(card).join("");
   setStatus("saveStatus", "");
 }
+$("teacherDoubtBtn").onclick = async () => {
+  if (!cur) return;
+  const q = $("teacherDoubtQuestion").value.trim();
+  if (q.length < 2) { $("teacherDoubtAnswer").textContent = "Type your doubt first."; return; }
+  const b = $("teacherDoubtBtn"), a = $("teacherDoubtAnswer");
+  b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Checking...";
+  try {
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ action:"doubt", classNo:Number(cur.classNo), subject:String(cur.subject||""), topic:String(cur.topic||""), question:q }) });
+    const j = await r.json();
+    a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
+  } catch(e){ a.textContent = "Could not reach AI."; }
+  finally { b.disabled = false; b.textContent = "🤖 Ask AI"; }
+};
 
 $("qs").addEventListener("input", e => {
-  const t = e.target, i = +t.dataset.i; if (isNaN(i) || !cur) return;
+  const t=e.target, i=+t.dataset.i; if (isNaN(i)||!cur) return;
   if (t.dataset.o !== undefined) cur.questions[i].options[+t.dataset.o] = t.value;
   else cur.questions[i][t.dataset.f] = t.value;
 });
 $("qs").addEventListener("click", e => {
-  const b = e.target.closest("[data-del]"); if (!b || !cur) return;
-  if (!confirm("Delete?")) return;
+  const b = e.target.closest("[data-del]"); if (!b||!cur) return;
+  if (!confirm("Delete this question?")) return;
   cur.questions.splice(+b.dataset.del, 1); renderEditor([], [], "", "");
 });
-$("cancelBtn").onclick = () => { cur = null; renderEditor(); setStatus("genStatus", ""); };
+$("cancelBtn").onclick = () => { cur = null; renderEditor(); setStatus("genStatus",""); };
 $("saveBtn").onclick = async () => {
-  if (!cur || !cur.questions.length) return setStatus("saveStatus", "No questions.", "err");
+  if (!cur || !cur.questions.length) return setStatus("saveStatus","No questions.","err");
   $("saveBtn").disabled = true;
   try {
-    const data = { classNo: cur.classNo, section: cur.section, subject: cur.subject, topic: cur.topic, mode: cur.mode, questions: cur.questions, title: `Class ${cur.classNo} ${cur.section} ${cur.subject} - ${cur.topic}`, createdBy: auth.currentUser.email, updatedAt: serverTimestamp() };
-    if (cur.id) await setDoc(doc(db, "papers", cur.id), data);
-    else { data.createdAt = serverTimestamp(); const r = await addDoc(collection(db, "papers"), data); cur.id = r.id; }
-    setStatus("saveStatus", "Saved.", "ok");
-  } catch (e) { setStatus("saveStatus", "Save failed: " + e.message, "err"); }
+    const data = { classNo:cur.classNo, subject:cur.subject, topic:cur.topic, mode:cur.mode, questions:cur.questions,
+      title:`Class ${cur.classNo} ${cur.subject} - ${cur.topic}`, createdBy:auth.currentUser.email, updatedAt:serverTimestamp() };
+    if (cur.id) await setDoc(doc(db,"papers",cur.id), data);
+    else { data.createdAt = serverTimestamp(); const r = await addDoc(collection(db,"papers"), data); cur.id = r.id; }
+    setStatus("saveStatus","Saved.","ok");
+  } catch(e){ setStatus("saveStatus","Save failed: "+e.message,"err"); }
   finally { $("saveBtn").disabled = false; }
 };
 
-async function loadSaved() {
+async function loadSaved(){
   $("savedList").textContent = "Loading...";
   try {
-    const snap = await getDocs(collection(db, "papers"));
-    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => ((b.updatedAt?.toMillis?.()||0) - (a.updatedAt?.toMillis?.()||0)));
+    const snap = await getDocs(collection(db,"papers"));
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()}))
+      .sort((a,b)=>((b.updatedAt?.toMillis?.()||0)-(a.updatedAt?.toMillis?.()||0)));
     if (!rows.length) return $("savedList").textContent = "No papers.";
-    $("savedList").innerHTML = rows.map(p => `<div class="item"><div><b>${esc(p.title)}</b><br><small>${p.mode} · ${p.questions.length} Qs</small></div><div><button class="sec" data-edit="${p.id}">✏️ Edit</button> <button class="del" data-rm="${p.id}">🗑️</button></div></div>`).join("");
-  } catch (e) { $("savedList").textContent = e.message; }
+    $("savedList").innerHTML = rows.map(p=>`<div class="item"><div><b>${esc(p.title)}</b><br><small>${p.mode} · ${p.questions.length} Qs</small></div><div><button class="sec" data-edit="${p.id}">✏️ Edit</button> <button class="del" data-rm="${p.id}">🗑️</button></div></div>`).join("");
+  } catch(e){ $("savedList").textContent = e.message; }
 }
-async function openPaper(id) {
-  const s = await getDoc(doc(db, "papers", id));
+async function openPaper(id){
+  const s = await getDoc(doc(db,"papers",id));
   if (!s.exists()) return alert("Deleted.");
   const p = s.data();
-  cur = { id, classNo: p.classNo, section: p.section || "All", subject: p.subject, topic: p.topic, mode: p.mode, questions: p.questions || [] };
+  cur = { id, classNo:p.classNo, subject:p.subject, topic:p.topic, mode:p.mode, questions:p.questions||[] };
   document.querySelector('nav button[data-tab="gen"]').click();
   renderEditor([], [], "", "");
-  $("editor").scrollIntoView({ behavior: "smooth" });
+  $("editor").scrollIntoView({behavior:"smooth"});
 }
 $("savedList").addEventListener("click", async e => {
   const ed = e.target.closest("[data-edit]"), rm = e.target.closest("[data-rm]");
   if (ed) openPaper(ed.dataset.edit);
-  if (rm && confirm("Delete?")) { await deleteDoc(doc(db, "papers", rm.dataset.rm)); loadSaved(); }
+  if (rm && confirm("Delete?")) { await deleteDoc(doc(db,"papers",rm.dataset.rm)); loadSaved(); }
 });
 
-async function loadRepCount() { try { const s = await getDocs(collection(db, "reports")); $("repN").textContent = s.size ? "(" + s.size + ")" : ""; } catch(e){} }
-async function loadReports() {
+async function loadRepCount(){ try { const s = await getDocs(collection(db,"reports")); $("repN").textContent = s.size ? "("+s.size+")" : ""; } catch(e){} }
+async function loadReports(){
   $("repList").textContent = "Loading...";
   try {
-    const snap = await getDocs(collection(db, "reports"));
-    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    $("repN").textContent = rows.length ? "(" + rows.length + ")" : "";
+    const snap = await getDocs(collection(db,"reports"));
+    const rows = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+    $("repN").textContent = rows.length ? "("+rows.length+")" : "";
     if (!rows.length) return $("repList").textContent = "No reports.";
-    $("repList").innerHTML = rows.map(r => `<div class="item"><div><b>${esc(r.title)}</b> · Q${esc(r.qNo)}<br><small>${esc(r.note)}</small></div><div><button class="sec" data-edit="${esc(r.paperId)}">📄 Open</button> <button class="sec" data-rr="${r.id}">✅ Done</button></div></div>`).join("");
-  } catch (e) { $("repList").textContent = e.message; }
+    $("repList").innerHTML = rows.map(r=>`<div class="item"><div><b>${esc(r.title)}</b> · Q${esc(r.qNo)}<br><small>${esc(r.note)}</small></div><div><button class="sec" data-edit="${esc(r.paperId)}">📄 Open</button> <button class="sec" data-rr="${r.id}">✅ Done</button></div></div>`).join("");
+  } catch(e){ $("repList").textContent = e.message; }
 }
 $("repList").addEventListener("click", async e => {
   const ed = e.target.closest("[data-edit]"), rr = e.target.closest("[data-rr]");
   if (ed) openPaper(ed.dataset.edit);
-  if (rr) { await deleteDoc(doc(db, "reports", rr.dataset.rr)); loadReports(); }
+  if (rr) { await deleteDoc(doc(db,"reports",rr.dataset.rr)); loadReports(); }
 });
 
-async function sha(s) { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
-async function loadCodes() {
-  let sC = {}, sS = {};
-  try { const s = await getDoc(doc(db, "private", "classCodes")); if (s.exists()) sC = s.data(); } catch(e){}
-  try { const s = await getDoc(doc(db, "private", "sectionCodes")); if (s.exists()) sS = s.data(); } catch(e){}
-  $("codeBox").innerHTML = `<h4>Class codes</h4>` + CLASSES.map(c => `<label>Class ${c}</label><input data-c="${c}" value="${esc(sC[c]||"")}">`).join("") + `<h4 style="margin-top:20px">Section codes</h4>` + SECTIONS.map(x => `<label>Section ${x}</label><input data-sc="${x}" value="${esc(sS[x]||"")}">`).join("");
+async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function loadCodes(){
+  let saved = {};
+  try { const s = await getDoc(doc(db,"private","classCodes")); if (s.exists()) saved = s.data(); } catch(e){}
+  $("codeBox").innerHTML = CLASSES.map(c=>`<label>Class ${c}</label><input data-c="${c}" value="${esc(saved[c]||"")}">`).join("");
 }
 $("codeSave").onclick = async () => {
-  const pC = {}, hC = {}, pS = {}, hS = {};
-  for (const inp of $("codeBox").querySelectorAll("input[data-c]")) { const c = inp.dataset.c, v = inp.value.trim(); if (v.length < 4) return setStatus("codeStatus", `Class ${c} needs 4+ chars.`, "err"); pC[c]=v; hC[c]=await sha(c+":"+v.toLowerCase()); }
-  for (const inp of $("codeBox").querySelectorAll("input[data-sc]")) { const x = inp.dataset.sc, v = inp.value.trim(); if (!v) continue; if (v.length < 4) return setStatus("codeStatus", `Section ${x} needs 4+ chars.`, "err"); pS[x]=v; hS[x]=await sha("section:"+x+":"+v.toLowerCase()); }
-  try { await setDoc(doc(db,"private","classCodes"), pC); await setDoc(doc(db,"settings","classCodeHashes"), hC); await setDoc(doc(db,"private","sectionCodes"), pS); await setDoc(doc(db,"settings","sectionCodeHashes"), hS); setStatus("codeStatus", "Saved.", "ok"); }
-  catch(e) { setStatus("codeStatus", "Save failed: " + e.message, "err"); }
+  const plain = {}, hashes = {};
+  for (const inp of $("codeBox").querySelectorAll("input")) {
+    const c = inp.dataset.c, v = inp.value.trim();
+    if (v.length < 4) return setStatus("codeStatus", `Class ${c} code needs 4+ chars.`, "err");
+    plain[c] = v; hashes[c] = await sha(c + ":" + v.toLowerCase());
+  }
+  try {
+    await setDoc(doc(db,"private","classCodes"), plain);
+    await setDoc(doc(db,"settings","classCodeHashes"), hashes);
+    setStatus("codeStatus", "Saved.", "ok");
+  } catch(e){ setStatus("codeStatus", "Save failed: " + e.message, "err"); }
 };
-
-fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "ping" }) }).catch(() => {});
 </script>
 </body>
 </html>
