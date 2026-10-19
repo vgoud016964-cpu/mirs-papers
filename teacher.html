@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
 <title>MIRS Practice Papers | Teacher Portal</title>
 <style>
 *{box-sizing:border-box}
@@ -113,6 +114,7 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
     <div class="doubt-card"><h3>💬 Ask a doubt about this paper's topic</h3><p id="teacherDoubtTopic" class="small">Ask about the topic of the paper being created.</p><textarea id="teacherDoubtQuestion" maxlength="500" placeholder="Ask for meaning, explanation, examples, or related information..."></textarea><button id="teacherDoubtBtn" class="go">🤖 Ask AI</button><div id="teacherDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>
     <p class="small">👀 <b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
     <div id="qs"></div>
+    <button id="diffBtn" class="sec" style="margin-top:15px; border-color:#ec4899; color:#db2777;">🔄 Give Different Paper (Uses 1 Limit)</button>
     <button id="saveBtn" class="go">💾 Save paper for students</button>
     <button id="cancelBtn" class="sec">✖️ Close without saving</button>
     <p id="saveStatus" class="status"></p>
@@ -279,6 +281,28 @@ $("qs").addEventListener("click", e => {
   if (!confirm("Delete this question?")) return;
   cur.questions.splice(+b.dataset.del, 1); renderEditor([], [], "", "");
 });
+
+$("diffBtn").onclick = async () => {
+  if (!cur) return;
+  $("diffBtn").disabled = true;
+  $("diffBtn").textContent = "⏳ Generating new...";
+  
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ idToken, classNo:cur.classNo, subject:cur.subject, topic:cur.topic, counts: { mcq: cur.questions.filter(q=>q.type==='mcq').length, ar: cur.questions.filter(q=>q.type==='ar').length, short: cur.questions.filter(q=>q.type==='short').length, long: cur.questions.filter(q=>q.type==='long').length } }) });
+    const j = await r.json();
+    
+    if (!j.ok) { alert(j.error || "Could not make new paper."); return; }
+    
+    // STRICTLY REPLACE the questions
+    cur.questions = j.questions;
+    renderEditor(j.warnings || [], [], j.writer, "");
+    alert("New paper generated! Previous questions replaced.");
+  } catch(e) { alert("Could not reach AI."); }
+  finally { $("diffBtn").disabled = false; $("diffBtn").textContent = "🔄 Give Different Paper (Uses 1 Limit)"; }
+};
+
 $("cancelBtn").onclick = () => { cur = null; renderEditor(); setStatus("genStatus",""); };
 $("saveBtn").onclick = async () => {
   if (!cur || !cur.questions.length) return setStatus("saveStatus","No questions.","err");
