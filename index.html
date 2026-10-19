@@ -267,7 +267,7 @@ $("paper").addEventListener("click", async e => {
     const j = await r.json();
     
     if (j.ok && j.isWrong === false) {
-       alert("AI Check: This question is correct. Reason: " + j.reason);
+              alert("AI Check: This question is correct.");
        b.textContent = "🚩 Report"; 
        b.disabled = false;
        return;
