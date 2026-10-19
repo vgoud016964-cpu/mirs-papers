@@ -111,24 +111,14 @@ $("studentAskBtn").onclick = async () => {
   const b=$("studentAskBtn"), a=$("studentAskAnswer");
   b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
   
-  const askTimer = setTimeout(() => {
-    if (b.textContent.includes("Thinking")) {
-      b.disabled = false; b.textContent = "Ask AI";
-      a.textContent = "The AI took too long. You may have hit the free daily limit. Please try again later.";
-    }
-  }, 15000);
-
   try {
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"ask", question:q }) });
     const j = await r.json();
-    clearTimeout(askTimer);
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch { 
-    clearTimeout(askTimer);
     a.textContent = "Could not reach AI service."; 
   }
   finally { 
-    clearTimeout(askTimer);
     b.disabled=false; b.textContent="Ask AI"; 
   }
 };
