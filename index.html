@@ -183,12 +183,32 @@ function renderPaper(){
       x += `${nl(q.q)}</p>`;
       if (q.type==="mcq") x += (q.options||[]).map((o,k)=>`<div class="opt">(${"ABCD"[k]}) ${esc(o)}</div>`).join("");
     }
-    if (practice) x += `<div class="ans">✅ <b>Answer (${esc(q.answer)})</b><br>${nl(q.explanation||q.answer)}</div>`;
+        if (practice) {
+      // Show answer and explanation right below the question for Practice Paper
+      x += `<div class="ans">✅ <b>Answer (${esc(q.answer)})</b><br>${nl(q.explanation||q.answer)}</div>`;
+    }
+    
     x += `<div class="rep"><button data-r="${i}">🚩 Report</button></div></div>`;
     return x;
   }).join("");
+  
+  // Show the Answer Key at the end ONLY if it is a Question paper
   if (!practice){
-    h += `<h3>🔑 Answer Key</h3>` + qs.map((q,i)=>`<div class="ans" style="margin-bottom:8px"><b>Q${i+1}:</b> ${esc(q.answer)}</div>`).join("");
+    h += `<h3>🔑 Answer Key</h3>` + qs.map((q,i)=>{
+      // For MCQ, add the correct option text if it exists
+      let answerText = esc(q.answer);
+      if (q.type === "mcq" && q.options) {
+         let correctIndex = {"A":0,"B":1,"C":2,"D":3}[q.answer];
+         if (correctIndex !== undefined && q.options[correctIndex]) {
+             answerText += ` - ${esc(q.options[correctIndex])}`;
+         }
+      }
+      
+      return `<div class="ans" style="margin-bottom:8px">
+        <b>Q${i+1}:</b> ${answerText} <br>
+        <span style="font-size: 13px; color: #555;">💡 <b>Explanation:</b> ${nl(q.explanation || "Refer to textbook.")}</span>
+      </div>`;
+    }).join("");
   }
   h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
