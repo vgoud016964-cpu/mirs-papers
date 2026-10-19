@@ -22,6 +22,7 @@ section.on{display:block}
 label{display:block;font-size:13px;font-weight:750;color:#384562;margin:13px 0 6px}
 input,select,textarea{width:100%;padding:11px 13px;border:1px solid #cbd3e6;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
 textarea{resize:vertical;min-height:76px}
+textarea.auto-expand{resize:none;overflow:hidden;min-height:44px;}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px}
 button.go{background:linear-gradient(115deg,#4b43c7,#7068e9);color:#fff;border:0;padding:12px 21px;border-radius:10px;font-weight:750;cursor:pointer;margin-top:15px;box-shadow:0 5px 13px rgba(75,67,199,.19)}
 button.go:disabled{opacity:.55;cursor:wait}
@@ -214,7 +215,7 @@ $("genBtn").onclick = async () => {
   setStatus("genStatus", "Writing the paper...");
   try {
     const idToken = await auth.currentUser.getIdToken();
-        const randomSeed = Math.random().toString(36).substring(7);
+    const randomSeed = Math.random().toString(36).substring(7);
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ idToken, classNo, subject, topic, counts, seed: randomSeed }) });
     const j = await r.json();
@@ -227,7 +228,27 @@ $("genBtn").onclick = async () => {
   finally { $("genBtn").disabled = false; }
 };
 
-function ta(i,f,v,rows){ return `<textarea data-i="${i}" data-f="${f}" rows="${rows||2}">${esc(v)}</textarea>`; }
+function autoExpand(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+document.addEventListener('input', e => {
+  if (e.target.tagName.toLowerCase() === 'textarea' && e.target.classList.contains('auto-expand')) {
+    autoExpand(e.target);
+  }
+});
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    m.addedNodes.forEach(node => {
+      if (node.nodeType === 1) {
+        node.querySelectorAll('textarea.auto-expand').forEach(autoExpand);
+      }
+    });
+  });
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+function ta(i,f,v,rows){ return `<textarea class="auto-expand" data-i="${i}" data-f="${f}" rows="${rows||2}">${esc(v)}</textarea>`; }
 function letters(i,v){ return `<select data-i="${i}" data-f="answer">${["A","B","C","D"].map(l=>`<option ${l===v?"selected":""}>${l}</option>`).join("")}</select>`; }
 function card(q,i){
   let h = `<div class="q"><h4><span>Q${i+1} · ${TYPE_NAME[q.type]}</span><button class="del" data-del="${i}">🗑️ Delete</button></h4>`;
@@ -290,13 +311,13 @@ $("diffBtn").onclick = async () => {
   
   try {
     const idToken = await auth.currentUser.getIdToken();
+    const randomSeed = Math.random().toString(36).substring(7);
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ idToken, classNo:cur.classNo, subject:cur.subject, topic:cur.topic, counts: { mcq: cur.questions.filter(q=>q.type==='mcq').length, ar: cur.questions.filter(q=>q.type==='ar').length, short: cur.questions.filter(q=>q.type==='short').length, long: cur.questions.filter(q=>q.type==='long').length } }) });
+      body: JSON.stringify({ idToken, classNo:cur.classNo, subject:cur.subject, topic:cur.topic, counts: { mcq: cur.questions.filter(q=>q.type==='mcq').length, ar: cur.questions.filter(q=>q.type==='ar').length, short: cur.questions.filter(q=>q.type==='short').length, long: cur.questions.filter(q=>q.type==='long').length }, seed: randomSeed }) });
     const j = await r.json();
     
     if (!j.ok) { alert(j.error || "Could not make new paper."); return; }
     
-    // STRICTLY REPLACE the questions
     cur.questions = j.questions;
     renderEditor(j.warnings || [], [], j.writer, "");
     alert("New paper generated! Previous questions replaced.");
