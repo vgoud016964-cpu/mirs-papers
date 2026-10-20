@@ -56,6 +56,8 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
 .field .fi{flex:none;width:52px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--fg)}
 .box .field input{flex:1;min-width:0;border:0;box-shadow:none;margin:0;background:transparent;padding:13px 12px;border-radius:0;font-size:15px}
 .box .field button{flex:none;border:0;border-left:1px solid #ede9fe;background:#f5f3ff;color:#6d28d9;padding:0 14px;margin:0;font-weight:700;border-radius:0;cursor:pointer}
+
+
 </style>
 </head>
 <body>
@@ -77,6 +79,7 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
   <button data-tab="saved">🗂️ Saved papers</button>
   <button data-tab="rep">🚩 Reports <span id="repN"></span></button>
   <button data-tab="codes">🔑 Class codes</button>
+  <button data-tab="updates">🌐 Live updates</button>
 </nav>
 <main>
 
@@ -103,11 +106,11 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
     <p id="genStatus" class="status"></p>
   </div>
 
-  <div class="card">
-    <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
-    <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
-    <textarea id="teacherAskInput" placeholder="Type your question here..."></textarea>
-    <button id="teacherAskBtn" class="go">🤖 Ask AI</button>
+  <div class="card" id="teacherAskCard">
+    <h3 style="margin-top:0">🧠 Ask Anything</h3>
+    <p class="small">Ask for live updates on news, current affairs, weather, government or exam notifications, education, science, and general knowledge. Sports scores, movie collections, and inappropriate questions are not allowed.</p>
+    <textarea id="teacherAskInput" maxlength="500" placeholder="Ask for a live update or any appropriate question..."></textarea>
+    <button id="teacherAskBtn" class="go">Get live answer</button>
     <div id="teacherAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
   </div>
 
@@ -135,13 +138,18 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
   <button id="codeSave" class="go">💾 Save codes</button>
   <p id="codeStatus" class="status"></p>
 </div></section>
+
+<section id="tab-updates">
+  <div class="card"><h3 style="margin-top:0">📢 Publish a teacher announcement</h3><p class="small">This announcement appears on both MIRS dashboards. Do not include private student information.</p><label for="announcementTitle">Title</label><input id="announcementTitle" maxlength="120" placeholder="Example: Class 8 practice paper uploaded"><label for="announcementMessage">Message</label><textarea id="announcementMessage" maxlength="500" placeholder="Write the announcement..."></textarea><button id="publishAnnouncement" class="go">📣 Publish announcement</button><p id="announcementStatus" class="status" aria-live="polite"></p></div>
+</section>
+
 </main>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, setDoc, doc, getDoc, getDocs, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, setDoc, doc, getDoc, getDocs, deleteDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const WORKER_URL = "https://mirs-papers-ai.vgoud016964.workers.dev";
 const firebaseConfig = { apiKey:"AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain:"mirs-ai.firebaseapp.com", projectId:"mirs-ai", storageBucket:"mirs-ai.firebasestorage.app", messagingSenderId:"478184601355", appId:"1:478184601355:web:85f99d485db2e12860940e" };
@@ -176,7 +184,7 @@ $("outBtn").onclick = () => signOut(auth);
 onAuthStateChanged(auth, u => {
   $("login").hidden = !!u;
   $("app").hidden = !u;
-  if (u) { $("who").textContent = u.email; loadRepCount(); }
+  if (u) { $("who").textContent = u.email; loadRepCount(); watchTeacherAnnouncements(); }
 });
 
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
@@ -189,21 +197,42 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 
 function setStatus(id, t, cls) { const e = $(id); e.textContent = t; e.className = "status " + (cls || ""); }
 
+
+
+let stopTeacherAnnouncements=null;
+function watchTeacherAnnouncements(){
+  if(stopTeacherAnnouncements)stopTeacherAnnouncements();
+  stopTeacherAnnouncements=onSnapshot(collection(db,"announcements"),snap=>{
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)).slice(0,15).map(a=>({title:a.title||"MIRS update",source:a.type==="paper"?`Paper · Class ${a.classNo||""} · ${a.subject||""}`:"Teacher announcement",message:a.message||a.topic||"",date:a.createdAt?.toDate?.()?.toISOString?.()||"",url:"https://vgoud016964-cpu.github.io/mirs-papers/"}));
+    const answer=$("teacherAskAnswer");
+    if(rows.length && !answer.dataset.answered){answer.textContent="Latest MIRS updates\n\n"+rows.map(a=>`${a.title}: ${a.message}`).join("\n\n");}
+  },()=>{});
+}
+$("publishAnnouncement").onclick=async()=>{
+  const title=$("announcementTitle").value.trim(),message=$("announcementMessage").value.trim(),btn=$("publishAnnouncement");
+  if(title.length<2||message.length<2){$("announcementStatus").textContent="Enter a title and message.";return;}
+  btn.disabled=true;$("announcementStatus").textContent="Publishing…";
+  try{await addDoc(collection(db,"announcements"),{type:"announcement",title:title.slice(0,120),message:message.slice(0,500),createdBy:"Teacher",createdAt:serverTimestamp()});$("announcementTitle").value="";$("announcementMessage").value="";$("announcementStatus").textContent="Announcement published.";}
+  catch(e){$("announcementStatus").textContent="Could not publish. Check Firestore rules for teacher writes to announcements.";}
+  finally{btn.disabled=false;}
+};
+
 $("teacherAskBtn").onclick = async () => {
   const q = $("teacherAskInput").value.trim();
   if (q.length < 2) return;
   const b = $("teacherAskBtn"), a = $("teacherAskAnswer");
+  a.dataset.answered="1";
   b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Asking AI (this can take up to 30 seconds)...";
   try {
     const idToken = await auth.currentUser.getIdToken();
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, 
-      body: JSON.stringify({ action:"ask", question:q, idToken }) });
+      body: JSON.stringify({ action:"liveChat", question:q, idToken }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch { 
     a.textContent = "Could not reach AI service. Check your internet.";
   } finally { 
-    b.disabled = false; b.textContent = "🤖 Ask AI"; 
+    b.disabled = false; b.textContent = "Get live answer"; 
   }
 };
 
@@ -292,7 +321,7 @@ $("teacherDoubtBtn").onclick = async () => {
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch(e){ a.textContent = "Could not reach AI."; }
-  finally { b.disabled = false; b.textContent = "🤖 Ask AI"; }
+  finally { b.disabled = false; b.textContent = "Get live answer"; }
 };
 
 $("qs").addEventListener("input", e => {
@@ -336,6 +365,7 @@ $("saveBtn").onclick = async () => {
       title:`Class ${cur.classNo} ${cur.section !== "All" ? "Sec " + cur.section : ""} ${cur.subject} - ${cur.topic}`, createdBy:auth.currentUser.email, updatedAt:serverTimestamp() };
     if (cur.id) await setDoc(doc(db,"papers",cur.id), data);
     else { data.createdAt = serverTimestamp(); const r = await addDoc(collection(db,"papers"), data); cur.id = r.id; }
+    try { await setDoc(doc(db,"announcements",cur.id), { type:"paper", title:data.title, paperId:cur.id, classNo:cur.classNo, subject:cur.subject, topic:cur.topic, createdBy:"Teacher", createdAt:serverTimestamp() }, { merge:true }); } catch (announcementError) { console.warn("Paper saved, but its dashboard announcement could not be published.", announcementError); }
     setStatus("saveStatus","Saved.","ok");
   } catch(e){ setStatus("saveStatus","Save failed: "+e.message,"err"); }
   finally { $("saveBtn").disabled = false; }

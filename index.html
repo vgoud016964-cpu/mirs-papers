@@ -39,6 +39,8 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
 .doubt-answer{white-space:pre-wrap;margin-top:10px;min-height:22px}
 [hidden]{display:none!important}
 @media print{.noprint,header,.rep{display:none!important}body{background:#fff}.card{box-shadow:none;border:0}}
+
+
 </style>
 </head>
 <body>
@@ -50,6 +52,7 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
   <span class="small" style="color:#fff">Student portal</span>
 </header>
 <main>
+
 <section id="s1" class="card">
   <h2>🔐 Open a paper</h2>
   <div class="row">
@@ -77,18 +80,18 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
   <button id="back2" class="sec">← Back</button>
 </section>
 
-<div class="card">
-  <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
-  <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
-  <textarea id="studentAskInput" placeholder="Type your question here..."></textarea>
-  <button id="studentAskBtn" class="go">🤖 Ask AI</button>
+<div class="card" id="studentAskCard">
+  <h3 style="margin-top:0">🧠 Ask Anything</h3>
+  <p class="small">Ask for live updates on news, current affairs, weather, government or exam notifications, education, science, and general knowledge. Sports scores, movie collections, and inappropriate questions are not allowed.</p>
+  <textarea id="studentAskInput" maxlength="500" placeholder="Ask for a live update or any appropriate question..."></textarea>
+  <button id="studentAskBtn" class="go">Get live answer</button>
   <div id="studentAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
 </div>
 </main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey:"AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain:"mirs-ai.firebaseapp.com", projectId:"mirs-ai", storageBucket:"mirs-ai.firebasestorage.app", messagingSenderId:"478184601355", appId:"1:478184601355:web:85f99d485db2e12860940e" };
 const app = initializeApp(firebaseConfig);
@@ -122,19 +125,34 @@ $("studentAskBtn").onclick = async () => {
   const q = $("studentAskInput").value.trim();
   if (q.length<2) return;
   const b=$("studentAskBtn"), a=$("studentAskAnswer");
+  a.dataset.answered="1";
   b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
   
   try {
-    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"ask", question:q }) });
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"liveChat", question:q }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch { 
     a.textContent = "Could not reach AI service."; 
   }
   finally { 
-    b.disabled=false; b.textContent="Ask AI"; 
+    b.disabled=false; b.textContent="Get live answer"; 
   }
 };
+
+
+let stopAnnouncements=null;
+function watchStudentAnnouncements(){
+  if(stopAnnouncements) stopAnnouncements();
+  stopAnnouncements=onSnapshot(collection(db,"announcements"),snap=>{
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)).slice(0,8);
+    const answer=$("studentAskAnswer");
+    if(rows.length && !answer.dataset.answered){
+      answer.textContent="Latest MIRS updates\n\n"+rows.map(a=>`${a.title||"MIRS update"}: ${a.message||a.topic||"New paper or teacher announcement"}`).join("\n\n");
+    }
+  },()=>{});
+}
+watchStudentAnnouncements();
 
 $("openBtn").onclick = async () => {
   const c=+$("cls").value, v=$("code").value.trim().toLowerCase();
