@@ -103,11 +103,11 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
     <p id="genStatus" class="status"></p>
   </div>
 
-  <div class="card" id="teacherAskCard">
-    <h3 style="margin-top:0">🧠 Ask Anything</h3>
-    <p class="small">Ask for live updates on news, current affairs, weather, government or exam notifications, education, science, and general knowledge. Sports scores, movie collections, and inappropriate questions are not allowed.</p>
-    <textarea id="teacherAskInput" maxlength="500" placeholder="Ask for a live update or any appropriate question..."></textarea>
-    <button id="teacherAskBtn" class="go">Get live answer</button>
+  <div class="card">
+    <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
+    <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
+    <textarea id="teacherAskInput" placeholder="Type your question here..."></textarea>
+    <button id="teacherAskBtn" class="go">🤖 Ask AI</button>
     <div id="teacherAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
   </div>
 
@@ -117,7 +117,7 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
     <div class="doubt-card"><h3>💬 Ask a doubt about this paper's topic</h3><p id="teacherDoubtTopic" class="small">Ask about the topic of the paper being created.</p><textarea id="teacherDoubtQuestion" maxlength="500" placeholder="Ask for meaning, explanation, examples, or related information..."></textarea><button id="teacherDoubtBtn" class="go">🤖 Ask AI</button><div id="teacherDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>
     <p class="small">👀 <b>Please read every question.</b> You can edit any text, change an answer, or delete a question. Students see only what you save.</p>
     <div id="qs"></div>
-    <button id="diffBtn" class="sec" style="margin-top:15px; border-color:#ec4899; color:#db2777;">🔄 Give Different Paper</button>
+    <button id="diffBtn" class="sec" style="margin-top:15px; border-color:#ec4899; color:#db2777;">🔄 Give Different Paper (Uses 1 Limit)</button>
     <button id="saveBtn" class="go">💾 Save paper for students</button>
     <button id="cancelBtn" class="sec">✖️ Close without saving</button>
     <p id="saveStatus" class="status"></p>
@@ -135,7 +135,6 @@ button.del{background:#fff7f7;color:#b42335;border:1px solid #f2b8bf;padding:7px
   <button id="codeSave" class="go">💾 Save codes</button>
   <p id="codeStatus" class="status"></p>
 </div></section>
-
 </main>
 </div>
 
@@ -194,17 +193,17 @@ $("teacherAskBtn").onclick = async () => {
   const q = $("teacherAskInput").value.trim();
   if (q.length < 2) return;
   const b = $("teacherAskBtn"), a = $("teacherAskAnswer");
-  b.disabled = true; b.textContent = "⏳ Searching..."; a.textContent = "Searching the web for the latest answer (can take up to 30 seconds)...";
+  b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Asking AI (this can take up to 30 seconds)...";
   try {
     const idToken = await auth.currentUser.getIdToken();
-    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ action:"liveChat", question:q, idToken }) });
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, 
+      body: JSON.stringify({ action:"ask", question:q, idToken }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
-  } catch {
+  } catch { 
     a.textContent = "Could not reach AI service. Check your internet.";
-  } finally {
-    b.disabled = false; b.textContent = "Get live answer";
+  } finally { 
+    b.disabled = false; b.textContent = "🤖 Ask AI"; 
   }
 };
 
@@ -288,9 +287,8 @@ $("teacherDoubtBtn").onclick = async () => {
   const b = $("teacherDoubtBtn"), a = $("teacherDoubtAnswer");
   b.disabled = true; b.textContent = "⏳ Thinking..."; a.textContent = "Checking...";
   try {
-    const idToken = await auth.currentUser.getIdToken();
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ action:"doubt", idToken, classNo:Number(cur.classNo), subject:String(cur.subject||""), topic:String(cur.topic||""), question:q }) });
+      body: JSON.stringify({ action:"doubt", classNo:Number(cur.classNo), subject:String(cur.subject||""), topic:String(cur.topic||""), question:q }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
   } catch(e){ a.textContent = "Could not reach AI."; }
@@ -312,18 +310,21 @@ $("diffBtn").onclick = async () => {
   if (!cur) return;
   $("diffBtn").disabled = true;
   $("diffBtn").textContent = "⏳ Generating new...";
+  
   try {
     const idToken = await auth.currentUser.getIdToken();
     const randomSeed = Math.random().toString(36).substring(7);
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ idToken, classNo:cur.classNo, subject:cur.subject, topic:cur.topic, counts: { mcq: cur.questions.filter(q=>q.type==='mcq').length, ar: cur.questions.filter(q=>q.type==='ar').length, short: cur.questions.filter(q=>q.type==='short').length, long: cur.questions.filter(q=>q.type==='long').length }, seed: randomSeed }) });
     const j = await r.json();
+    
     if (!j.ok) { alert(j.error || "Could not make new paper."); return; }
+    
     cur.questions = j.questions;
     renderEditor(j.warnings || [], [], j.writer, "");
     alert("New paper generated! Previous questions replaced.");
   } catch(e) { alert("Could not reach AI."); }
-  finally { $("diffBtn").disabled = false; $("diffBtn").textContent = "🔄 Give Different Paper"; }
+  finally { $("diffBtn").disabled = false; $("diffBtn").textContent = "🔄 Give Different Paper (Uses 1 Limit)"; }
 };
 
 $("cancelBtn").onclick = () => { cur = null; renderEditor(); setStatus("genStatus",""); };
@@ -385,11 +386,11 @@ $("repList").addEventListener("click", async e => {
 async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 async function loadCodes(){
   let savedClass = {}, savedSec = {};
-  try {
-    const s1 = await getDoc(doc(db,"private","classCodes")); if (s1.exists()) savedClass = s1.data();
-    const s2 = await getDoc(doc(db,"private","sectionCodes")); if (s2.exists()) savedSec = s2.data();
+  try { 
+    const s1 = await getDoc(doc(db,"private","classCodes")); if (s1.exists()) savedClass = s1.data(); 
+    const s2 = await getDoc(doc(db,"private","sectionCodes")); if (s2.exists()) savedSec = s2.data(); 
   } catch(e){}
-
+  
   $("codeBox").innerHTML = `<h4>Class Codes</h4>` + CLASSES.map(c=>`<label>Class ${c}</label><input data-c="${c}" value="${esc(savedClass[c]||"")}">`).join("");
   $("sectionBox").innerHTML = `<h4>Section Codes</h4>` + SECTIONS.filter(s => s !== "All").map(s=>`<label>Section ${s}</label><input data-s="${s}" value="${esc(savedSec[s]||"")}">`).join("");
 }
