@@ -7,7 +7,7 @@
 <title>MIRS Practice Papers - Free Practice Papers for Students</title>
 <meta name="description" content="MIRS Practice Papers: free practice papers and question papers for students. Practice and prepare for exams.">
 <link rel="canonical" href="https://vgoud016964-cpu.github.io/mirs-papers/">
-  <style>
+<style>
 *{box-sizing:border-box}
 :root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--shadow:0 10px 30px rgba(38,39,94,.08)}
 body{margin:0;font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at top left,#e9eaff 0,transparent 43%),var(--bg);color:var(--ink);line-height:1.55}
@@ -39,8 +39,6 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
 .doubt-answer{white-space:pre-wrap;margin-top:10px;min-height:22px}
 [hidden]{display:none!important}
 @media print{.noprint,header,.rep{display:none!important}body{background:#fff}.card{box-shadow:none;border:0}}
-
-
 </style>
 </head>
 <body>
@@ -91,7 +89,7 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = { apiKey:"AIzaSyCOQ-jq_ObgDWiD8C8v_HX2IxJ1FYOSe9Y", authDomain:"mirs-ai.firebaseapp.com", projectId:"mirs-ai", storageBucket:"mirs-ai.firebasestorage.app", messagingSenderId:"478184601355", appId:"1:478184601355:web:85f99d485db2e12860940e" };
 const app = initializeApp(firebaseConfig);
@@ -125,34 +123,18 @@ $("studentAskBtn").onclick = async () => {
   const q = $("studentAskInput").value.trim();
   if (q.length<2) return;
   const b=$("studentAskBtn"), a=$("studentAskAnswer");
-  a.dataset.answered="1";
-  b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
-  
+  b.disabled=true; b.textContent="⏳ Searching..."; a.textContent="Searching the web for the latest answer (can take up to 20 seconds)...";
   try {
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"liveChat", question:q }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
-  } catch { 
-    a.textContent = "Could not reach AI service."; 
+  } catch {
+    a.textContent = "Could not reach AI service.";
   }
-  finally { 
-    b.disabled=false; b.textContent="Get live answer"; 
+  finally {
+    b.disabled=false; b.textContent="Get live answer";
   }
 };
-
-
-let stopAnnouncements=null;
-function watchStudentAnnouncements(){
-  if(stopAnnouncements) stopAnnouncements();
-  stopAnnouncements=onSnapshot(collection(db,"announcements"),snap=>{
-    const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0)).slice(0,8);
-    const answer=$("studentAskAnswer");
-    if(rows.length && !answer.dataset.answered){
-      answer.textContent="Latest MIRS updates\n\n"+rows.map(a=>`${a.title||"MIRS update"}: ${a.message||a.topic||"New paper or teacher announcement"}`).join("\n\n");
-    }
-  },()=>{});
-}
-watchStudentAnnouncements();
 
 $("openBtn").onclick = async () => {
   const c=+$("cls").value, v=$("code").value.trim().toLowerCase();
@@ -219,7 +201,7 @@ function renderPaper(){
     x += `<div class="rep"><button data-r="${i}">🚩 Report</button></div></div>`;
     return x;
   }).join("");
-  
+
   if (!practice){
     h += `<div class="noprint" style="margin-top:20px; text-align:center;">
             <button id="toggleKeyBtn" class="go" style="background:linear-gradient(115deg,#16a34a,#22c55e);">🔑 Show Answer Key</button>
@@ -233,14 +215,13 @@ function renderPaper(){
              answerText += ` - ${esc(q.options[correctIndex])}`;
          }
       }
-      
       return `<div class="ans" style="margin-bottom:8px">
         <b>Q${i+1}:</b> ${answerText} <br>
         <span style="font-size: 13px; color: #555;">💡 <b>Explanation:</b> ${nl(q.explanation || "Refer to textbook.")}</span>
       </div>`;
     }).join("") + `</div>`;
   }
-  
+
   h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" class="auto-expand" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
 }
@@ -273,31 +254,31 @@ $("paper").addEventListener("click", async e => {
     finally { ask.disabled=false; ask.textContent="🤖 Ask AI"; }
     return;
   }
-  
+
   const b = e.target.closest("[data-r]"); if (!b||!open) return;
   const note = prompt("What is wrong with this question?"); if (!note) return;
-  
-  b.textContent = "⏳ AI Checking..."; 
+
+  b.textContent = "⏳ AI Checking...";
   b.disabled = true;
-  
+
   try {
     const qData = open.questions[+b.dataset.r];
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ action:"verifyReport", classNo:Number(open.classNo), subject:String(open.subject||""), topic:String(open.topic||""), questionData: qData }) });
     const j = await r.json();
-    
+
     if (j.ok && j.isWrong === false) {
-              alert("AI Check: This question is correct.");
-       b.textContent = "🚩 Report"; 
-       b.disabled = false;
-       return;
+      alert("AI Check: This question is correct.");
+      b.textContent = "🚩 Report";
+      b.disabled = false;
+      return;
     }
-    
+
     await addDoc(collection(db,"reports"), { paperId:open.id, title:open.title||open.topic, qNo:+b.dataset.r+1, note:note.trim().slice(0,300), createdAt:new Date().toISOString() });
     b.textContent = "✅ Reported";
-  } catch { 
-    alert("Could not send report."); 
-    b.textContent = "🚩 Report"; 
+  } catch {
+    alert("Could not send report.");
+    b.textContent = "🚩 Report";
     b.disabled = false;
   }
 });
