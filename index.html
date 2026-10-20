@@ -3,10 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="index, follow">
-<title>MIRS Practice Papers - Free Practice Papers for Students</title>
-<meta name="description" content="MIRS Practice Papers: free practice papers and question papers for students. Practice and prepare for exams.">
-<link rel="canonical" href="https://vgoud016964-cpu.github.io/mirs-papers/">
+<meta name="robots" content="noindex">
+<title>MIRS Practice Papers | Student Portal</title>
 <style>
 *{box-sizing:border-box}
 :root{color-scheme:light;--ink:#15223b;--muted:#68758d;--primary:#4b43c7;--teal:#0e9f9a;--line:#dce3f0;--surface:#fff;--bg:#f4f6fc;--shadow:0 10px 30px rgba(38,39,94,.08)}
@@ -50,7 +48,6 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
   <span class="small" style="color:#fff">Student portal</span>
 </header>
 <main>
-
 <section id="s1" class="card">
   <h2>🔐 Open a paper</h2>
   <div class="row">
@@ -78,11 +75,11 @@ button.on{background:linear-gradient(120deg,#4b43c7,#6961e5);color:#fff;border-c
   <button id="back2" class="sec">← Back</button>
 </section>
 
-<div class="card" id="studentAskCard">
-  <h3 style="margin-top:0">🧠 Ask Anything</h3>
-  <p class="small">Ask for live updates on news, current affairs, weather, government or exam notifications, education, science, and general knowledge. Sports scores, movie collections, and inappropriate questions are not allowed.</p>
-  <textarea id="studentAskInput" maxlength="500" placeholder="Ask for a live update or any appropriate question..."></textarea>
-  <button id="studentAskBtn" class="go">Get live answer</button>
+<div class="card">
+  <h3 style="margin-top:0">🧠 Ask Anything Educational</h3>
+  <p class="small">Ask any general knowledge, school, or current affairs question. Sports scores and bad words are blocked.</p>
+  <textarea id="studentAskInput" placeholder="Type your question here..."></textarea>
+  <button id="studentAskBtn" class="go">🤖 Ask AI</button>
   <div id="studentAskAnswer" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#fff;border-radius:10px;border:1px solid #dce5f2;min-height:100px;overflow-y:auto;"></div>
 </div>
 </main>
@@ -106,16 +103,6 @@ let classNo=0, section="All", subject="", papers=[], open=null;
 
 $("sec").innerHTML = `<option value="All">All sections</option>` + SECTIONS.map(x=>`<option value="${x}">${x}</option>`).join("");
 
-function autoExpand(textarea) {
-  textarea.style.height = 'auto';
-  textarea.style.height = textarea.scrollHeight + 'px';
-}
-document.addEventListener('input', e => {
-  if (e.target.tagName.toLowerCase() === 'textarea' && e.target.classList.contains('auto-expand')) {
-    autoExpand(e.target);
-  }
-});
-
 async function sha(s){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 function show(id){ ["s1","s2","s3"].forEach(x=>$(x).hidden = x!==id); window.scrollTo(0,0); }
 
@@ -123,16 +110,17 @@ $("studentAskBtn").onclick = async () => {
   const q = $("studentAskInput").value.trim();
   if (q.length<2) return;
   const b=$("studentAskBtn"), a=$("studentAskAnswer");
-  b.disabled=true; b.textContent="⏳ Searching..."; a.textContent="Searching the web for the latest answer (can take up to 20 seconds)...";
+  b.disabled=true; b.textContent="⏳ Thinking..."; a.textContent="Checking...";
+  
   try {
-    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"liveChat", question:q }) });
+    const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"ask", question:q }) });
     const j = await r.json();
     a.textContent = j.ok ? j.answer : (j.error || "Could not answer.");
-  } catch {
-    a.textContent = "Could not reach AI service.";
+  } catch { 
+    a.textContent = "Could not reach AI service."; 
   }
-  finally {
-    b.disabled=false; b.textContent="Get live answer";
+  finally { 
+    b.disabled=false; b.textContent="Ask AI"; 
   }
 };
 
@@ -201,7 +189,7 @@ function renderPaper(){
     x += `<div class="rep"><button data-r="${i}">🚩 Report</button></div></div>`;
     return x;
   }).join("");
-
+  
   if (!practice){
     h += `<div class="noprint" style="margin-top:20px; text-align:center;">
             <button id="toggleKeyBtn" class="go" style="background:linear-gradient(115deg,#16a34a,#22c55e);">🔑 Show Answer Key</button>
@@ -215,13 +203,14 @@ function renderPaper(){
              answerText += ` - ${esc(q.options[correctIndex])}`;
          }
       }
+      
       return `<div class="ans" style="margin-bottom:8px">
         <b>Q${i+1}:</b> ${answerText} <br>
         <span style="font-size: 13px; color: #555;">💡 <b>Explanation:</b> ${nl(q.explanation || "Refer to textbook.")}</span>
       </div>`;
     }).join("") + `</div>`;
   }
-
+  
   h += `<div class="doubt-card noprint"><h3>💬 Ask a doubt about this topic</h3><p class="small">Ask about <b>${esc(p.topic)}</b>.</p><textarea id="studentDoubtQuestion" class="auto-expand" maxlength="500" placeholder="Type your doubt..."></textarea><button id="studentDoubtBtn" class="go">🤖 Ask AI</button><div id="studentDoubtAnswer" class="doubt-answer" aria-live="polite"></div></div>`;
   $("paper").innerHTML = h;
 }
@@ -254,31 +243,31 @@ $("paper").addEventListener("click", async e => {
     finally { ask.disabled=false; ask.textContent="🤖 Ask AI"; }
     return;
   }
-
+  
   const b = e.target.closest("[data-r]"); if (!b||!open) return;
   const note = prompt("What is wrong with this question?"); if (!note) return;
-
-  b.textContent = "⏳ AI Checking...";
+  
+  b.textContent = "⏳ AI Checking..."; 
   b.disabled = true;
-
+  
   try {
     const qData = open.questions[+b.dataset.r];
     const r = await fetch(WORKER_URL, { method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ action:"verifyReport", classNo:Number(open.classNo), subject:String(open.subject||""), topic:String(open.topic||""), questionData: qData }) });
     const j = await r.json();
-
+    
     if (j.ok && j.isWrong === false) {
-      alert("AI Check: This question is correct.");
-      b.textContent = "🚩 Report";
-      b.disabled = false;
-      return;
+       alert("AI Check: This question is correct.");
+       b.textContent = "🚩 Report"; 
+       b.disabled = false;
+       return;
     }
-
+    
     await addDoc(collection(db,"reports"), { paperId:open.id, title:open.title||open.topic, qNo:+b.dataset.r+1, note:note.trim().slice(0,300), createdAt:new Date().toISOString() });
     b.textContent = "✅ Reported";
-  } catch {
-    alert("Could not send report.");
-    b.textContent = "🚩 Report";
+  } catch { 
+    alert("Could not send report."); 
+    b.textContent = "🚩 Report"; 
     b.disabled = false;
   }
 });
